@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APVC · Portal de Gestão</title>
+<!-- Segoe UI — fonte nativa do Windows -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --ink:       #0A0B0D;
+  --ink-2:     #111318;
+  --ink-3:     #181C24;
+  --panel:     #1A1E28;
+  --card:      #20252F;
+  --card-2:    #262C38;
+  --border:    rgba(255,255,255,0.07);
+  --border-h:  rgba(255,255,255,0.14);
+  --gold:      #C8A84B;
+  --gold-l:    #E4C87A;
+  --gold-d:    #8B6F2E;
+  --green:     #2A9D6F;
+  --green-l:   #3DC68D;
+  --text:      #F0EDE8;
+  --text-2:    #9BA3AF;
+  --text-3:    #5C6470;
+  --red:       #E05252;
+  --blue:      #5B9CF6;
+  --amber:     #F0A843;
+  --sidebar:   240px;
+  --radius:    14px;
+  --radius-sm: 8px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+
+body{
+  font-family:'Segoe UI','Segoe UI Variable','Segoe UI Historic',system-ui,-apple-system,sans-serif;
+  background:var(--ink);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-h);border-radius:4px}
+
+/* ══════════════════════════════
+   LOGIN
+══════════════════════════════ */
+#login-screen{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--ink);
+  overflow:hidden;
+}
+.login-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 50%, rgba(200,168,75,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 80% 30%, rgba(42,157,111,0.06) 0%, transparent 60%);
+}
+.login-lines{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size:80px 80px;
+}
+.login-card{
+  position:relative;z-index:1;
+  width:420px;
+  background:var(--ink-3);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:48px 44px;
+  box-shadow:0 40px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04);
+  animation:fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.login-mark{
+  display:flex;align-items:center;gap:14px;margin-bottom:36px;
+}
+.login-crest{
+  width:52px;height:52px;
+  background:linear-gradient(135deg, var(--gold) 0%, var(--gold-d) 100%);
+  border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  font-size:24px;font-weight:700;
+  color:var(--ink);
+  box-shadow:0 8px 24px rgba(200,168,75,0.35);
+  flex-shrink:0;
+}
+.login-mark-text h1{
+  font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  font-size:22px;font-weight:600;
+  color:var(--text);letter-spacing:0.3px;
+}
+.login-mark-text p{
+  font-size:11px;font-weight:400;
+  color:var(--text-3);letter-spacing:2px;
+  text-transform:uppercase;margin-top:2px;
+}
+.login-divider{
+  height:1px;background:var(--border);margin-bottom:30px;
+}
+.lf{margin-bottom:18px}
+.lf label{
+  display:block;font-size:10px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-3);margin-bottom:8px;
+}
+.lf input{
+  width:100%;padding:13px 16px;
+  background:var(--ink-2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--text);
+  font-family:'Segoe UI','Segoe UI Variable',system-ui,sans-serif;font-size:14px;
+  outline:none;transition:border-color 0.2s,box-shadow 0.2s;
+}
+.lf input:focus{
+  border-color:rgba(200,168,75,0.5);
+  box-shadow:0 0 0 3px rgba(200,168,75,0.08);
+}
+.lf input::placeholder{color:var(--text-3)}
+.login-btn{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg, var(--gold) 0%, #A8882C 100%);
+  border:none;border-radius:var(--radius-sm);
+  font-family:'Segoe UI','Segoe UI Variable',system-ui,sans-serif;font-size:14px;font-weight:600;
+  color:var(--ink);cursor:pointer;
+  letter-spacing:0.5px;margin-top:6px;
+  transition:opacity 0.2s,transform 0.15s,box-shadow 0.2s;
+  box-shadow:0 4px 20px rgba(200,168,75,0.3);
+}
+.login-btn:hover{opacity:0.92;box-shadow:0 6px 28px rgba(200,168,75,0.4)}
+.login-btn:active{transform:scale(0.99)}
+.login-err{
+  font-size:12px;color:var(--red);text-align:center;
+  margin-top:12px;display:none;
+  animation:shake 0.3s ease;
+}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ══════════════════════════════
+   APP SHELL
+══════════════════════════════ */
+#app{display:none;min-height:100vh}
+
+/* ══ SIDEBAR ══ */
+.sidebar{
+  position:fixed;top:0;left:0;
+  width:var(--sidebar);height:100vh;
+  background:var(--ink-2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  z-index:200;
+  overflow:hidden;
+}
+.sidebar::before{
+  content:'';position:absolute;
+  top:-100px;left:-80px;
+  width:300px;height:300px;
+  background:radial-gradient(circle, rgba(200,168,75,0.06) 0%, transparent 65%);
+  pointer-events:none;
+}
+.sb-head{
+  padding:24px 20px 20px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.sb-logo{display:flex;align-items:center;gap:12px}
+.sb-crest{
+  width:40px;height:40px;
+  background:linear-gradient(135deg, var(--gold) 0%, var(--gold-d) 100%);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  font-size:20px;font-weight:700;color:var(--ink);
+  flex-shrink:0;
+  box-shadow:0 4px 16px rgba(200,168,75,0.25);
+}
+.sb-brand h2{
+  font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  font-size:18px;font-weight:600;color:var(--text);
+}
+.sb-brand p{
+  font-size:10px;font-weight:400;
+  color:var(--text-3);letter-spacing:1.5px;
+  text-transform:uppercase;margin-top:1px;
+}
+.sb-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.sb-section{
+  font-size:9px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-3);padding:0 10px;
+  margin:16px 0 6px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  cursor:pointer;
+  color:var(--text-3);font-size:13px;font-weight:400;
+  transition:all 0.15s;
+  margin-bottom:1px;
+  position:relative;overflow:hidden;
+}
+.nav-item::before{
+  content:'';position:absolute;
+  left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:0;
+  background:var(--gold);border-radius:2px;
+  transition:height 0.2s;
+}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.nav-item.active{
+  background:rgba(200,168,75,0.1);
+  color:var(--gold);font-weight:500;
+}
+.nav-item.active::before{height:20px}
+.nav-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(255,255,255,0.04);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+  transition:background 0.15s;
+}
+.nav-item.active .nav-icon{background:rgba(200,168,75,0.15)}
+.nav-item:hover .nav-icon{background:rgba(255,255,255,0.07)}
+.sb-foot{
+  padding:14px 12px 18px;
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.sb-user{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  margin-bottom:8px;
+}
+.sb-avatar{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-d));
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:var(--ink);
+  font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  flex-shrink:0;
+}
+.sb-user-info{flex:1;min-width:0}
+.sb-user-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:10px;color:var(--text-3);margin-top:1px}
+.logout-btn{
+  width:100%;padding:9px 12px;
+  background:transparent;border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--text-3);font-family:'Segoe UI','Segoe UI Variable',system-ui,sans-serif;font-size:12px;
+  cursor:pointer;transition:all 0.15s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.logout-btn:hover{border-color:var(--border-h);color:var(--text);background:rgba(255,255,255,0.04)}
+
+/* ══ MAIN ══ */
+.main{margin-left:var(--sidebar);min-height:100vh}
+
+/* ══ TOPBAR ══ */
+.topbar{
+  height:58px;
+  background:rgba(10,11,13,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;
+  position:sticky;top:0;z-index:100;
+}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-crumb{
+  font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  font-size:20px;font-weight:600;
+  color:var(--text);
+}
+.tb-tag{
+  font-size:10px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;
+  background:rgba(200,168,75,0.12);
+  color:var(--gold);
+  padding:4px 10px;border-radius:20px;
+  border:1px solid rgba(200,168,75,0.2);
+}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-date{
+  font-size:12px;color:var(--text-3);
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:6px 12px;
+}
+.tb-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px rgba(42,157,111,0.6);
+  animation:pulse-dot 2s infinite;
+}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 8px rgba(42,157,111,0.6)}50%{box-shadow:0 0 14px rgba(42,157,111,0.9)}}
+
+.content{padding:28px}
+
+/* ══ PANELS ══ */
+.panel{display:none;animation:panelIn 0.3s ease both}
+.panel.active{display:block}
+@keyframes panelIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ SECTION HEADER ══ */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.ph-title{
+  font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  font-size:28px;font-weight:600;
+  color:var(--text);line-height:1.2;
+}
+.ph-sub{font-size:13px;color:var(--text-3);margin-top:3px}
+.ph-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ══ BUTTONS ══ */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 16px;border-radius:var(--radius-sm);
+  font-family:'Segoe UI','Segoe UI Variable',system-ui,sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;border:none;transition:all 0.15s;
+  white-space:nowrap;
+}
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold) 0%,#A8882C 100%);
+  color:var(--ink);
+  box-shadow:0 2px 12px rgba(200,168,75,0.25);
+}
+.btn-gold:hover{box-shadow:0 4px 20px rgba(200,168,75,0.4);opacity:0.95}
+.btn-ghost{
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);
+  color:var(--text-2);
+}
+.btn-ghost:hover{background:rgba(255,255,255,0.08);color:var(--text);border-color:var(--border-h)}
+.btn-red{background:rgba(224,82,82,0.12);border:1px solid rgba(224,82,82,0.2);color:var(--red)}
+.btn-red:hover{background:rgba(224,82,82,0.2)}
+.btn-sm{padding:6px 11px;font-size:11px}
+
+/* ══ KPI GRID ══ */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:14px;margin-bottom:22px;
+}
+.kpi{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  position:relative;overflow:hidden;
+  transition:border-color 0.2s,transform 0.2s;
+  cursor:default;
+}
+.kpi:hover{border-color:var(--border-h);transform:translateY(-2px)}
+.kpi::before{
+  content:'';position:absolute;
+  top:0;right:0;
+  width:80px;height:80px;
+  border-radius:50%;
+  opacity:0.12;
+  transform:translate(30%,-30%);
+}
+.kpi.gold::before{background:var(--gold)}
+.kpi.green::before{background:var(--green)}
+.kpi.blue::before{background:var(--blue)}
+.kpi.red::before{background:var(--red)}
+.kpi.amber::before{background:var(--amber)}
+.kpi.teal::before{background:#2DD4BF}
+.kpi.purple::before{background:#A78BFA}
+.kpi-label{
+  font-size:10px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-3);margin-bottom:10px;
+}
+.kpi-val{
+  font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  font-size:40px;font-weight:700;
+  color:var(--text);line-height:1;
+}
+.kpi-sub{font-size:11px;color:var(--text-3);margin-top:6px}
+.kpi-bar{
+  height:3px;background:rgba(255,255,255,0.06);
+  border-radius:2px;margin-top:10px;overflow:hidden;
+}
+.kpi-bar-fill{height:100%;border-radius:2px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1)}
+.kpi.gold .kpi-bar-fill{background:var(--gold)}
+.kpi.green .kpi-bar-fill{background:var(--green)}
+.kpi.blue .kpi-bar-fill{background:var(--blue)}
+.kpi.teal .kpi-bar-fill{background:#2DD4BF}
+
+/* ══ CARD ══ */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:22px;margin-bottom:18px;
+  transition:border-color 0.2s;
+}
+.card:hover{border-color:var(--border-h)}
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:16px;margin-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+.card-title{
+  font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  font-size:17px;font-weight:600;color:var(--text);
+  display:flex;align-items:center;gap:8px;
+}
+.card-icon{
+  width:28px;height:28px;border-radius:7px;
+  background:rgba(200,168,75,0.12);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+}
+
+/* ══ CHART ROW ══ */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.chart-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);padding:22px;
+  transition:border-color 0.2s;
+}
+.chart-card:hover{border-color:var(--border-h)}
+.cc-label{
+  font-size:10px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-3);margin-bottom:16px;
+}
+canvas{max-height:230px}
+
+/* ══ TABLE ══ */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:rgba(255,255,255,0.03);
+  padding:10px 14px;text-align:left;
+  font-size:10px;font-weight:600;
+  letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--text-3);border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:12px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  color:var(--text-2);
+  transition:background 0.1s;
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
+
+/* ══ PILL / TAG ══ */
+.pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:20px;
+  font-size:11px;font-weight:500;
+}
+.pill-gold{background:rgba(200,168,75,0.15);color:var(--gold);border:1px solid rgba(200,168,75,0.2)}
+.pill-green{background:rgba(42,157,111,0.15);color:var(--green-l);border:1px solid rgba(42,157,111,0.2)}
+.pill-blue{background:rgba(91,156,246,0.15);color:var(--blue);border:1px solid rgba(91,156,246,0.2)}
+.pill-red{background:rgba(224,82,82,0.15);color:var(--red);border:1px solid rgba(224,82,82,0.2)}
+.pill-amber{background:rgba(240,168,67,0.15);color:var(--amber);border:1px solid rgba(240,168,67,0.2)}
+
+/* ══ MONTH SEL ══ */
+.month-sel{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:7px 12px;font-size:12px;color:var(--text-2);
+}
+.month-sel select{
+  background:transparent;border:none;outline:none;
+  color:var(--text);font-family:'Segoe UI','Segoe UI Variable',system-ui,sans-serif;font-size:12px;
+  cursor:pointer;
+}
+.month-sel select option{background:var(--ink-3);color:var(--text)}
+
+/* ══ TABS ══ */
+.tabs{
+  display:flex;gap:2px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  padding:3px;border-radius:10px;
+  margin-bottom:20px;width:fit-content;
+}
+.tab{
+  padding:7px 18px;border-radius:7px;
+  font-size:12px;font-weight:500;
+  cursor:pointer;color:var(--text-3);
+  border:none;background:transparent;
+  font-family:'Segoe UI','Segoe UI Variable',system-ui,sans-serif;
+  transition:all 0.15s;
+}
+.tab.active{
+  background:var(--card-2);color:var(--text);
+  box-shadow:0 2px 8px rgba(0,0,0,0.3);
+}
+.tab:hover:not(.active){color:var(--text-2)}
+
+/* ══ ORGANOGRAM ══ */
+.org-wrap{
+  display:flex;flex-direction:column;
+  align-items:center;padding:20px 10px;
+  gap:0;overflow-x:auto;
+}
+.org-level{
+  display:flex;gap:12px;
+  justify-content:center;
+  margin-bottom:28px;
+}
+.org-node{
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;
+}
+.org-card{
+  background:var(--card-2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px 16px;min-width:140px;
+  text-align:center;cursor:pointer;
+  transition:all 0.2s;
+  position:relative;overflow:hidden;
+}
+.org-card:hover{border-color:var(--border-h);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.org-card.n0{
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold-d) 100%);
+  border-color:var(--gold);color:var(--ink);
+}
+.org-card.n0 .oc-name{color:var(--ink);font-weight:700}
+.org-card.n0 .oc-role{color:rgba(10,11,13,0.65)}
+.org-card.n1{border-color:rgba(200,168,75,0.3);background:rgba(200,168,75,0.08)}
+.org-card.n1 .oc-name{color:var(--gold)}
+.org-card.n2{border-color:rgba(42,157,111,0.25)}
+.org-card.n2 .oc-name{color:var(--green-l)}
+.org-card.n3{border-color:rgba(91,156,246,0.2)}
+.org-card.n3 .oc-name{color:var(--blue)}
+.oc-emoji{font-size:22px;margin-bottom:6px;display:block}
+.oc-name{font-size:12px;font-weight:600;margin-bottom:2px}
+.oc-role{font-size:10px;color:var(--text-3)}
+.org-line-v{
+  width:1px;height:20px;
+  background:var(--border);
+}
+
+/* ══ FINACEIRO ITEM ══ */
+.fin-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.fin-row:last-child{border-bottom:none}
+.fin-row-name{font-size:13px;color:var(--text-2)}
+.fin-row-val{font-size:14px;font-weight:600}
+.fin-row-val.rec{color:var(--green-l)}
+.fin-row-val.desp{color:var(--red)}
+
+/* ══ MANUT ITEM ══ */
+.manut-item{
+  display:flex;gap:14px;align-items:flex-start;
+  padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.manut-item:last-child{border-bottom:none}
+.manut-prio{
+  width:36px;height:36px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;margin-top:2px;
+}
+.mp-ok{background:rgba(42,157,111,0.15)}
+.mp-pendente{background:rgba(240,168,67,0.15)}
+.mp-urgente{background:rgba(224,82,82,0.15)}
+.manut-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px}
+.manut-desc{font-size:11px;color:var(--text-3)}
+
+/* ══ COMUNICADO ITEM ══ */
+.comun-item{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:16px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.comun-item:last-child{border-bottom:none}
+.comun-date{
+  background:rgba(200,168,75,0.1);
+  border:1px solid rgba(200,168,75,0.2);
+  border-radius:10px;padding:8px 12px;
+  text-align:center;min-width:54px;flex-shrink:0;
+}
+.cd-day{font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;font-size:22px;font-weight:700;color:var(--gold);line-height:1}
+.cd-mon{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-d)}
+.comun-body{flex:1}
+.comun-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.comun-desc{font-size:12px;color:var(--text-3)}
+
+/* ══ MODAL ══ */
+.modal-ov{
+  position:fixed;inset:0;z-index:999;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
+}
+.modal-ov.open{display:flex}
+.modal{
+  background:var(--ink-3);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:30px;width:560px;
+  max-width:95vw;max-height:88vh;
+  overflow-y:auto;
+  box-shadow:0 32px 80px rgba(0,0,0,0.7);
+  animation:modalIn 0.25s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+.modal-title{
+  font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  font-size:22px;font-weight:600;color:var(--text);
+  margin-bottom:4px;
+}
+.modal-sub{font-size:12px;color:var(--text-3);margin-bottom:22px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg.full{grid-column:1/-1}
+.fg label{
+  font-size:10px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);
+}
+.fg input,.fg select,.fg textarea{
+  background:var(--ink-2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--text);
+  font-family:'Segoe UI','Segoe UI Variable',system-ui,sans-serif;font-size:13px;
+  padding:10px 13px;outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.fg textarea{resize:vertical;min-height:72px}
+.fg input:focus,.fg select:focus,.fg textarea:focus{
+  border-color:rgba(200,168,75,0.4);
+  box-shadow:0 0 0 3px rgba(200,168,75,0.07);
+}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--text-3)}
+.fg select option{background:var(--ink-3)}
+.modal-actions{
+  display:flex;gap:8px;justify-content:flex-end;
+  margin-top:22px;padding-top:16px;
+  border-top:1px solid var(--border);
+}
+
+/* ══ DIVIDER ══ */
+.divider{
+  height:1px;background:var(--border);
+  margin:22px 0;
+}
+.divider-label{
+  display:flex;align-items:center;gap:12px;
+  font-size:10px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-3);margin-bottom:16px;
+}
+.divider-label::before,.divider-label::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+
+/* ══ TOAST ══ */
+.toast{
+  position:fixed;bottom:20px;right:20px;z-index:9999;
+  background:var(--card-2);
+  border:1px solid var(--border);
+  border-left:3px solid var(--gold);
+  border-radius:var(--radius-sm);
+  padding:12px 18px;font-size:13px;
+  color:var(--text);
+  transform:translateX(calc(100% + 24px));
+  opacity:0;
+  transition:all 0.35s cubic-bezier(0.16,1,0.3,1);
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  max-width:300px;
+}
+.toast.show{transform:translateX(0);opacity:1}
+
+/* ══ SALDO BADGE ══ */
+.saldo-pos{color:var(--green-l)}
+.saldo-neg{color:var(--red)}
+
+@media(max-width:900px){
+  .chart-row{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .fg.full{grid-column:1}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-lines"></div>
+  <div class="login-card">
+    <div class="login-mark">
+      <div class="login-crest">A</div>
+      <div class="login-mark-text">
+        <h1>Portal da Gestão</h1>
+        <p>Gestão Interna</p>
+      </div>
+    </div>
+    <div class="login-divider"></div>
+    <div class="lf"><label>Usuário</label><input type="text" id="le" placeholder="seu usuário" autocomplete="username"></div>
+    <div class="lf"><label>Senha</label><input type="password" id="ls" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="login-btn" onclick="doLogin()">Acessar Portal</button>
+    <p class="login-err" id="lerr">Credenciais inválidas. Tente novamente.</p>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-head">
+      <div class="sb-logo">
+        <div class="sb-crest">A</div>
+        <div class="sb-brand"><h2>APVC</h2><p>Gestão Interna</p></div>
+      </div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section">Painéis</div>
+      <div class="nav-item active" onclick="showPanel('lotes',this)">
+        <div class="nav-icon">🏘️</div>Censo de Lotes
+      </div>
+      <div class="nav-item" onclick="showPanel('funcionarios',this)">
+        <div class="nav-icon">👥</div>Funcionários
+      </div>
+      <div class="nav-item" onclick="showPanel('financeiro',this)">
+        <div class="nav-icon">💰</div>Financeiro
+      </div>
+      <div class="sb-section">Operações</div>
+      <div class="nav-item" onclick="showPanel('manutencao',this)">
+        <div class="nav-icon">🔧</div>Manutenção
+      </div>
+      <div class="nav-item" onclick="showPanel('preventivas',this)">
+        <div class="nav-icon">🛠️</div>Preventivas & Corretivas
+      </div>
+      <div class="nav-item" onclick="showPanel('reservas',this)">
+        <div class="nav-icon">📅</div>Reservas
+      </div>
+      <div class="nav-item" onclick="showPanel('comunicados',this)">
+        <div class="nav-icon">📣</div>Comunicados
+      </div>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar">AL</div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-nome">Alessandro Lima</div>
+          <div class="sb-user-role">Administrador</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">← Sair do Portal</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left">
+        <span class="tb-crumb" id="tb-crumb">Censo de Lotes</span>
+        <span class="tb-tag">APVC</span>
+      </div>
+      <div class="tb-right">
+        <span class="tb-date" id="tb-date"></span>
+        <div class="tb-dot" title="Sistema online"></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ████ P1: LOTES ████ -->
+      <div class="panel active" id="panel-lotes">
+        <div class="ph">
+          <div><div class="ph-title">Censo de Lotes</div><div class="ph-sub">327 lotes · Atualização mês a mês</div></div>
+          <div class="ph-actions">
+            <div class="month-sel">📅 <select id="sel-lm" onchange="renderLotes()"></select></div>
+            <button class="btn btn-ghost" onclick="abrirModalLotes()">✏️ Editar Dados</button>
+            <button class="btn btn-gold" onclick="abrirModalLotes()">+ Novo Mês</button>
+          </div>
+        </div>
+        <div class="kpi-grid" id="lkpi"></div>
+        <div class="chart-row">
+          <div class="chart-card"><div class="cc-label">Composição dos Lotes</div><canvas id="ch-lotes-pie"></canvas></div>
+          <div class="chart-card"><div class="cc-label">Evolução — Casas Construídas</div><canvas id="ch-lotes-line"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title"><div class="card-icon">📋</div>Detalhamento Residencial</div>
+          </div>
+          <div class="kpi-grid" id="lkpi2"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title"><div class="card-icon">🕘</div>Histórico Mensal</div></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Período</th><th>Lotes</th><th>Construídas</th><th>Fixos</th><th>Veraneio</th><th>Vazios</th><th>Obras</th><th>Paradas</th><th>APVC</th></tr></thead>
+              <tbody id="lhist"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ████ P2: FUNCIONÁRIOS ████ -->
+      <div class="panel" id="panel-funcionarios">
+        <div class="ph">
+          <div><div class="ph-title">Equipe & Organograma</div><div class="ph-sub">Estrutura organizacional completa</div></div>
+          <div class="ph-actions">
+            <button class="btn btn-gold" onclick="abrirModalFunc(null)">+ Funcionário</button>
+          </div>
+        </div>
+        <div class="tabs">
+          <button class="tab active" id="tab-org" onclick="setTab('org')">Organograma</button>
+          <button class="tab" id="tab-lista" onclick="setTab('lista')">Lista Completa</button>
+          <button class="tab" id="tab-fkpi" onclick="setTab('fkpi')">Indicadores</button>
+        </div>
+        <div id="vw-org">
+          <div class="card"><div class="card-head"><div class="card-title"><div class="card-icon">🏢</div>Estrutura Organizacional</div></div><div class="org-wrap" id="org-wrap"></div></div>
+        </div>
+        <div id="vw-lista" style="display:none">
+          <div class="card"><div class="card-head"><div class="card-title"><div class="card-icon">👥</div>Todos os Colaboradores</div></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Cargo</th><th>Depto</th><th>Turno</th><th>Admissão</th><th>Ações</th></tr></thead><tbody id="ftbody"></tbody></table></div></div>
+        </div>
+        <div id="vw-fkpi" style="display:none">
+          <div class="kpi-grid" id="fkpi"></div>
+          <div class="chart-row">
+            <div class="chart-card"><div class="cc-label">Distribuição por Departamento</div><canvas id="ch-fdept"></canvas></div>
+            <div class="chart-card"><div class="cc-label">Distribuição por Turno</div><canvas id="ch-fturno"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ████ P3: FINANCEIRO ████ -->
+      <div class="panel" id="panel-financeiro">
+        <div class="ph">
+          <div><div class="ph-title">Financeiro</div><div class="ph-sub">Receitas, despesas e saldo mensal</div></div>
+          <div class="ph-actions">
+            <div class="month-sel">📅 <select id="sel-fm" onchange="renderFin()"></select></div>
+            <button class="btn btn-gold" onclick="abrirModalFin()">✏️ Atualizar Mês</button>
+          </div>
+        </div>
+        <div class="kpi-grid" id="finkpi"></div>
+        <div class="chart-row">
+          <div class="chart-card"><div class="cc-label">Receitas × Despesas (histórico)</div><canvas id="ch-fin-bar"></canvas></div>
+          <div class="chart-card"><div class="cc-label">Despesas por Categoria</div><canvas id="ch-fin-pie"></canvas></div>
+        </div>
+        <div class="chart-row" style="grid-template-columns:1fr 1fr">
+          <div class="card" style="margin-bottom:0">
+            <div class="card-head"><div class="card-title"><div class="card-icon">📥</div>Receitas do Mês</div></div>
+            <div id="fin-rec"></div>
+          </div>
+          <div class="card" style="margin-bottom:0">
+            <div class="card-head"><div class="card-title"><div class="card-icon">📤</div>Despesas do Mês</div></div>
+            <div id="fin-desp"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ████ P4: MANUTENÇÃO ████ -->
+      <div class="panel" id="panel-manutencao">
+        <div class="ph">
+          <div><div class="ph-title">Manutenção & Serviços</div><div class="ph-sub">Ordens de serviço e acompanhamento</div></div>
+          <div class="ph-actions"><button class="btn btn-gold" onclick="abrirModalManut(null)">+ Nova Ordem</button></div>
+        </div>
+        <div class="kpi-grid" id="mkpi"></div>
+        <div class="card"><div class="card-head"><div class="card-title"><div class="card-icon">🔧</div>Ordens de Serviço</div></div><div id="mlista"></div></div>
+      </div>
+
+      <!-- ████ P5: COMUNICADOS ████ -->
+      <div class="panel" id="panel-comunicados">
+        <div class="ph">
+          <div><div class="ph-title">Comunicados & Eventos</div><div class="ph-sub">Mural oficial do condomínio</div></div>
+          <div class="ph-actions"><button class="btn btn-gold" onclick="abrirModalComun(null)">+ Novo Comunicado</button></div>
+        </div>
+        <div class="kpi-grid" id="ckpi"></div>
+        <div class="card"><div class="card-head"><div class="card-title"><div class="card-icon">📣</div>Mural de Comunicados</div></div><div id="clista"></div></div>
+      </div>
+
+      <!-- ████ P6: PREVENTIVAS & CORRETIVAS ████ -->
+      <div class="panel" id="panel-preventivas">
+        <div class="ph">
+          <div><div class="ph-title">Preventivas & Corretivas</div><div class="ph-sub">Registro e histórico de manutenções do condomínio</div></div>
+          <div class="ph-actions">
+            <button class="btn btn-gold" onclick="abrirModalPrev(null)">+ Novo Registro</button>
+          </div>
+        </div>
+        <div class="kpi-grid" id="pvkpi"></div>
+        <div class="card">
+          <div class="card-head" style="flex-wrap:wrap;gap:12px">
+            <div class="card-title"><div class="card-icon">🛠️</div>Registros</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <input type="text" id="prev-busca" placeholder="🔍 Pesquisar texto..." oninput="renderPreventivas()"
+                style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;width:190px;outline:none;">
+              <select id="prev-filtro-tipo" onchange="renderPreventivas()"
+                style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+                <option value="">Todos os tipos</option>
+                <option value="Preventiva">Preventiva</option>
+                <option value="Corretiva">Corretiva</option>
+              </select>
+              <select id="prev-filtro-status" onchange="renderPreventivas()"
+                style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+                <option value="">Todos os status</option>
+                <option value="pendente">Pendente</option>
+                <option value="em_andamento">Em Andamento</option>
+                <option value="concluida">Concluída</option>
+              </select>
+              <select id="prev-filtro-local" onchange="renderPreventivas()"
+                style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+                <option value="">Todos os locais</option>
+                <option value="Portaria">Portaria</option>
+                <option value="Área de Lazer">Área de Lazer</option>
+                <option value="Sede Social">Sede Social</option>
+                <option value="Lago">Lago</option>
+                <option value="Ruas Internas">Ruas Internas</option>
+                <option value="Elétrica">Elétrica</option>
+                <option value="Hidráulica">Hidráulica</option>
+                <option value="Geral">Geral</option>
+              </select>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:12px;color:var(--text-2);white-space:nowrap">De:</span>
+                <input type="date" id="prev-data-ini" onchange="renderPreventivas()"
+                  style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+                <span style="font-size:12px;color:var(--text-2);white-space:nowrap">Até:</span>
+                <input type="date" id="prev-data-fim" onchange="renderPreventivas()"
+                  style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+              </div>
+              <button onclick="limparFiltrosPrev()" class="btn btn-ghost btn-sm" style="white-space:nowrap">✕ Limpar</button>
+            </div>
+          </div>
+          <div id="pvlista"></div>
+        </div>
+      </div>
+
+      <!-- ████ P7: RESERVAS ████ -->
+      <div class="panel" id="panel-reservas">
+        <div class="ph">
+          <div><div class="ph-title">Gestão de Reservas</div><div class="ph-sub">Agendamento de espaços e áreas comuns do condomínio</div></div>
+          <div class="ph-actions">
+            <button class="btn btn-gold" onclick="abrirModalRes(null)">+ Nova Reserva</button>
+          </div>
+        </div>
+        <div class="kpi-grid" id="res-kpi"></div>
+
+        <!-- Filtros e Pesquisa -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head" style="flex-wrap:wrap;gap:10px">
+            <div class="card-title"><div class="card-icon">🔍</div>Pesquisa & Filtros</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <input type="text" id="res-busca" placeholder="Nome, lote, observação..." oninput="renderReservas()"
+                style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;width:200px;outline:none;">
+              <select id="res-f-espaco" onchange="renderReservas()"
+                style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+                <option value="">Todos os espaços</option>
+                <option>Quadra de Areia</option>
+                <option>Quadra de Tennis</option>
+                <option>Quadra de Saibro</option>
+                <option>Ginásio</option>
+                <option>Campo</option>
+                <option>Sala de Jogos</option>
+                <option>Quiosque</option>
+                <option>Sede Social</option>
+                <option>Cozinha / Espaço Lazer</option>
+              </select>
+              <select id="res-f-status" onchange="renderReservas()"
+                style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+                <option value="">Todos os status</option>
+                <option value="confirmada">Confirmada</option>
+                <option value="pendente">Pendente</option>
+                <option value="cancelada">Cancelada</option>
+                <option value="realizada">Realizada</option>
+              </select>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:12px;color:var(--text-2);white-space:nowrap">De:</span>
+                <input type="date" id="res-f-ini" onchange="renderReservas()"
+                  style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+                <span style="font-size:12px;color:var(--text-2);white-space:nowrap">Até:</span>
+                <input type="date" id="res-f-fim" onchange="renderReservas()"
+                  style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+              </div>
+              <button onclick="limparFiltrosRes()" class="btn btn-ghost btn-sm">✕ Limpar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de Reservas -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title"><div class="card-icon">📋</div>Reservas</div>
+            <div style="display:flex;gap:8px">
+              <select id="res-ordem" onchange="renderReservas()"
+                style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+                <option value="data_asc">Data ↑</option>
+                <option value="data_desc">Data ↓</option>
+                <option value="espaco">Espaço A–Z</option>
+                <option value="status">Status</option>
+              </select>
+            </div>
+          </div>
+          <div id="res-lista"></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- M: Reservas -->
+<div class="modal-ov" id="m-res">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-title" id="mres-t">Nova Reserva</div>
+    <div class="modal-sub">Preencha os dados da reserva do espaço comum</div>
+    <input type="hidden" id="mres-id">
+    <div class="form-grid">
+
+      <!-- Identificação -->
+      <div class="fg full" style="grid-column:1/-1;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:4px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold)">▸ Identificação</span>
+      </div>
+      <div class="fg">
+        <label>Nome do Morador</label>
+        <input type="text" id="mres-nome" placeholder="Nome completo">
+      </div>
+      <div class="fg">
+        <label>Lote / Quadra</label>
+        <input type="text" id="mres-lote" placeholder="Ex: Quadra 5 Lote 12">
+      </div>
+      <div class="fg">
+        <label>Telefone</label>
+        <input type="text" id="mres-tel" placeholder="(11) 99999-9999">
+      </div>
+      <div class="fg">
+        <label>N° de Pessoas</label>
+        <input type="number" id="mres-pessoas" placeholder="Ex: 20" min="1">
+      </div>
+
+      <!-- Espaço e Horário -->
+      <div class="fg full" style="grid-column:1/-1;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:4px;margin-top:8px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold)">▸ Espaço & Horário</span>
+      </div>
+      <div class="fg">
+        <label>Espaço</label>
+        <select id="mres-espaco">
+          <option value="Quadra de Areia">🏐 Quadra de Areia</option>
+          <option value="Quadra de Tennis">🎾 Quadra de Tennis</option>
+          <option value="Quadra de Saibro">🎾 Quadra de Saibro</option>
+          <option value="Ginásio">🏋️ Ginásio</option>
+          <option value="Campo">⚽ Campo</option>
+          <option value="Sala de Jogos">🎱 Sala de Jogos</option>
+          <option value="Quiosque">🌴 Quiosque</option>
+          <option value="Sede Social">🏛️ Sede Social</option>
+          <option value="Cozinha / Espaço Lazer">🍽️ Cozinha / Espaço Lazer</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Status</label>
+        <select id="mres-status">
+          <option value="pendente">Pendente</option>
+          <option value="confirmada">Confirmada</option>
+          <option value="cancelada">Cancelada</option>
+          <option value="realizada">Realizada</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Data da Reserva</label>
+        <input type="date" id="mres-data">
+      </div>
+      <div class="fg">
+        <label>Horário</label>
+        <select id="mres-horario" onchange="$('mres-hr-custom-wrap').style.display=this.value==='personalizado'?'':'none'">
+          <option value="07:00–10:00">07:00 – 10:00</option>
+          <option value="08:00–12:00">08:00 – 12:00</option>
+          <option value="10:00–13:00">10:00 – 13:00</option>
+          <option value="13:00–17:00">13:00 – 17:00</option>
+          <option value="14:00–18:00">14:00 – 18:00</option>
+          <option value="17:00–21:00">17:00 – 21:00</option>
+          <option value="18:00–22:00">18:00 – 22:00</option>
+          <option value="08:00–18:00">08:00 – 18:00 (Dia inteiro)</option>
+          <option value="10:00–22:00">10:00 – 22:00 (Evento)</option>
+          <option value="personalizado">Personalizado</option>
+        </select>
+      </div>
+      <div class="fg" id="mres-hr-custom-wrap" style="display:none">
+        <label>Horário Personalizado</label>
+        <input type="text" id="mres-hr-custom" placeholder="Ex: 15:00 – 20:00">
+      </div>
+      <div class="fg full" style="grid-column:1/-1">
+        <label>Finalidade / Tipo de Evento</label>
+        <input type="text" id="mres-finalidade" placeholder="Ex: Aniversário, Confraternização, Treino, Torneio...">
+      </div>
+
+      <!-- Financeiro -->
+      <div class="fg full" style="grid-column:1/-1;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:4px;margin-top:8px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold)">▸ Financeiro</span>
+      </div>
+      <div class="fg">
+        <label>Taxa de Reserva (R$)</label>
+        <input type="number" id="mres-taxa" placeholder="0,00" min="0" step="0.01">
+      </div>
+      <div class="fg">
+        <label>Caução / Depósito (R$)</label>
+        <input type="number" id="mres-caucao" placeholder="0,00" min="0" step="0.01">
+      </div>
+      <div class="fg">
+        <label>Pagamento</label>
+        <select id="mres-pgto">
+          <option value="pendente">Pendente</option>
+          <option value="pago">Pago</option>
+          <option value="isento">Isento</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Data do Pagamento</label>
+        <input type="date" id="mres-data-pgto">
+      </div>
+
+      <!-- Checklist -->
+      <div class="fg full" style="grid-column:1/-1;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:4px;margin-top:8px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold)">▸ Checklist Obrigatório</span>
+      </div>
+      <div class="fg full" style="grid-column:1/-1">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <label style="display:flex;align-items:center;gap:10px;background:var(--ink-3);padding:12px 14px;border-radius:10px;cursor:pointer;border:1px solid var(--border);text-transform:none;letter-spacing:0;font-size:13px;font-weight:500">
+            <input type="checkbox" id="mres-chk-termo" style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer">
+            📝 Termo de Responsabilidade Assinado
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;background:var(--ink-3);padding:12px 14px;border-radius:10px;cursor:pointer;border:1px solid var(--border);text-transform:none;letter-spacing:0;font-size:13px;font-weight:500">
+            <input type="checkbox" id="mres-chk-vistoria-pre" style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer">
+            🔍 Vistoria Pré-Evento Realizada
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;background:var(--ink-3);padding:12px 14px;border-radius:10px;cursor:pointer;border:1px solid var(--border);text-transform:none;letter-spacing:0;font-size:13px;font-weight:500">
+            <input type="checkbox" id="mres-chk-vistoria-pos" style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer">
+            ✅ Vistoria Pós-Evento Realizada
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;background:var(--ink-3);padding:12px 14px;border-radius:10px;cursor:pointer;border:1px solid var(--border);text-transform:none;letter-spacing:0;font-size:13px;font-weight:500">
+            <input type="checkbox" id="mres-chk-caucao-dev" style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer">
+            💰 Caução Devolvida
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;background:var(--ink-3);padding:12px 14px;border-radius:10px;cursor:pointer;border:1px solid var(--border);text-transform:none;letter-spacing:0;font-size:13px;font-weight:500">
+            <input type="checkbox" id="mres-chk-regras" style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer">
+            📋 Regras de Uso Informadas
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;background:var(--ink-3);padding:12px 14px;border-radius:10px;cursor:pointer;border:1px solid var(--border);text-transform:none;letter-spacing:0;font-size:13px;font-weight:500">
+            <input type="checkbox" id="mres-chk-devolucao" style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer">
+            🔑 Chave / Acesso Devolvido
+          </label>
+        </div>
+      </div>
+
+      <!-- Observações -->
+      <div class="fg full" style="grid-column:1/-1;margin-top:8px">
+        <label>Observações Gerais</label>
+        <textarea id="mres-obs" rows="3" placeholder="Anotações sobre o evento, ocorrências, danos, acordos especiais..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-res')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarRes()">Salvar Reserva</button>
+    </div>
+  </div>
+</div>
+
+<!-- M: Preventivas & Corretivas -->
+<div class="modal-ov" id="m-prev">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-title" id="mpv-t">Novo Registro</div>
+    <div class="modal-sub">Preencha todos os detalhes da manutenção</div>
+    <input type="hidden" id="mpv-id">
+    <div class="form-grid">
+      <div class="fg full" style="grid-column:1/-1">
+        <label>Título / Descrição Resumida</label>
+        <input type="text" id="mpv-tit" placeholder="Ex: Lubrificação dos portões eletrônicos">
+      </div>
+      <div class="fg">
+        <label>Tipo</label>
+        <select id="mpv-tipo">
+          <option value="Preventiva">Preventiva</option>
+          <option value="Corretiva">Corretiva</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Status</label>
+        <select id="mpv-status">
+          <option value="pendente">Pendente</option>
+          <option value="em_andamento">Em Andamento</option>
+          <option value="concluida">Concluída</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Local / Área</label>
+        <select id="mpv-local">
+          <option value="Portaria">Portaria</option>
+          <option value="Área de Lazer">Área de Lazer</option>
+          <option value="Sede Social">Sede Social</option>
+          <option value="Lago">Lago</option>
+          <option value="Ruas Internas">Ruas Internas</option>
+          <option value="Elétrica">Elétrica</option>
+          <option value="Hidráulica">Hidráulica</option>
+          <option value="Geral">Geral</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Prioridade</label>
+        <select id="mpv-prio">
+          <option value="baixa">Baixa</option>
+          <option value="media">Média</option>
+          <option value="alta">Alta</option>
+          <option value="urgente">Urgente</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Data de Abertura</label>
+        <input type="date" id="mpv-data-abertura">
+      </div>
+      <div class="fg">
+        <label>Previsão de Conclusão</label>
+        <input type="date" id="mpv-data-prev">
+      </div>
+      <div class="fg">
+        <label>Responsável</label>
+        <input type="text" id="mpv-resp" placeholder="Nome do responsável ou empresa">
+      </div>
+      <div class="fg">
+        <label>Custo (R$)</label>
+        <input type="number" id="mpv-custo" placeholder="0,00" min="0" step="0.01">
+      </div>
+      <div class="fg full" style="grid-column:1/-1">
+        <label>Detalhes / Observações</label>
+        <textarea id="mpv-obs" rows="4" placeholder="Descreva o problema encontrado, materiais usados, observações importantes..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-prev')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarPrev()">Salvar Registro</button>
+    </div>
+  </div>
+</div>
+
+<!-- M: Lotes -->
+<div class="modal-ov" id="m-lotes">
+  <div class="modal">
+    <div class="modal-title">Atualizar Censo de Lotes</div>
+    <div class="modal-sub">Salve os dados mensais — cada mês fica registrado no histórico.</div>
+    <div class="form-grid">
+      <div class="fg full"><label>Mês / Ano</label><input type="month" id="fl-mes"></div>
+      <div class="fg"><label>Total de Lotes</label><input type="number" id="fl-total"></div>
+      <div class="fg"><label>Casas Construídas</label><input type="number" id="fl-casas"></div>
+      <div class="fg"><label>Moradores Fixos</label><input type="number" id="fl-fixos"></div>
+      <div class="fg"><label>Veraneio</label><input type="number" id="fl-veraneio"></div>
+      <div class="fg"><label>Lotes APVC</label><input type="number" id="fl-apvc"></div>
+      <div class="fg"><label>Obras em Andamento</label><input type="number" id="fl-obras"></div>
+      <div class="fg"><label>Obras Paradas</label><input type="number" id="fl-par"></div>
+      <div class="fg"><label>Terrenos Vazios</label><input type="number" id="fl-terrenos"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-lotes')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarLotes()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- M: Func -->
+<div class="modal-ov" id="m-func">
+  <div class="modal">
+    <div class="modal-title" id="mf-t">Novo Colaborador</div>
+    <div class="modal-sub">Preencha os dados do funcionário.</div>
+    <input type="hidden" id="mf-id">
+    <div class="form-grid">
+      <div class="fg full"><label>Nome Completo</label><input type="text" id="mf-nome" placeholder="Nome do colaborador"></div>
+      <div class="fg"><label>Cargo</label><input type="text" id="mf-cargo" placeholder="Ex: Porteiro"></div>
+      <div class="fg"><label>Departamento</label>
+        <select id="mf-dept"><option>Diretoria</option><option>Administração</option><option>Segurança</option><option>Manutenção</option><option>Limpeza</option><option>Jardinagem</option><option>Serviços Gerais</option></select>
+      </div>
+      <div class="fg"><label>Turno</label>
+        <select id="mf-turno"><option>Comercial</option><option>Diurno</option><option>Noturno</option><option>12x36</option><option>Diarista</option></select>
+      </div>
+      <div class="fg"><label>Data de Admissão</label><input type="date" id="mf-adm"></div>
+      <div class="fg"><label>Nível Hierárquico</label>
+        <select id="mf-nivel"><option value="0">Diretoria / Síndico</option><option value="1">Gestores</option><option value="2" selected>Colaboradores</option><option value="3">Auxiliares / Terceirizados</option></select>
+      </div>
+      <div class="fg"><label>Emoji</label><input type="text" id="mf-emoji" placeholder="👤" maxlength="2"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-func')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarFunc()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- M: Fin -->
+<div class="modal-ov" id="m-fin">
+  <div class="modal">
+    <div class="modal-title">Atualizar Financeiro</div>
+    <div class="modal-sub">Informe os valores do mês selecionado em R$.</div>
+    <div class="form-grid">
+      <div class="fg full"><label>Mês / Ano</label><input type="month" id="ff-mes"></div>
+      <div class="divider-label full" style="grid-column:1/-1">Receitas</div>
+      <div class="fg"><label>Taxa Condominial</label><input type="number" id="ff-taxa" placeholder="0"></div>
+      <div class="fg"><label>Multas e Juros</label><input type="number" id="ff-multas" placeholder="0"></div>
+      <div class="fg full"><label>Outras Receitas</label><input type="number" id="ff-outrec" placeholder="0"></div>
+      <div class="divider-label full" style="grid-column:1/-1">Despesas</div>
+      <div class="fg"><label>Folha de Pagamento</label><input type="number" id="ff-folha" placeholder="0"></div>
+      <div class="fg"><label>Manutenção</label><input type="number" id="ff-manut" placeholder="0"></div>
+      <div class="fg"><label>Água e Energia</label><input type="number" id="ff-util" placeholder="0"></div>
+      <div class="fg"><label>Segurança</label><input type="number" id="ff-seg" placeholder="0"></div>
+      <div class="fg"><label>Administrativo</label><input type="number" id="ff-adm" placeholder="0"></div>
+      <div class="fg"><label>Outras Despesas</label><input type="number" id="ff-outdesp" placeholder="0"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-fin')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarFin()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- M: Manut -->
+<div class="modal-ov" id="m-manut">
+  <div class="modal">
+    <div class="modal-title" id="mm-t">Nova Ordem de Serviço</div>
+    <input type="hidden" id="mm-id">
+    <div class="form-grid">
+      <div class="fg full"><label>Título</label><input type="text" id="mm-tit" placeholder="Descreva o serviço"></div>
+      <div class="fg full"><label>Descrição</label><textarea id="mm-desc" placeholder="Detalhes..."></textarea></div>
+      <div class="fg"><label>Prioridade</label>
+        <select id="mm-prio"><option value="ok">✅ Concluído</option><option value="pendente" selected>🟡 Pendente</option><option value="urgente">🔴 Urgente</option></select>
+      </div>
+      <div class="fg"><label>Data</label><input type="date" id="mm-data"></div>
+      <div class="fg full"><label>Responsável</label><input type="text" id="mm-resp" placeholder="Nome do responsável"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-manut')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarManut()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- M: Comun -->
+<div class="modal-ov" id="m-comun">
+  <div class="modal">
+    <div class="modal-title" id="mc-t">Novo Comunicado</div>
+    <input type="hidden" id="mc-id">
+    <div class="form-grid">
+      <div class="fg full"><label>Título</label><input type="text" id="mc-tit" placeholder="Título do comunicado"></div>
+      <div class="fg full"><label>Texto</label><textarea id="mc-desc" placeholder="Conteúdo..." rows="3"></textarea></div>
+      <div class="fg"><label>Data</label><input type="date" id="mc-data"></div>
+      <div class="fg"><label>Categoria</label>
+        <select id="mc-cat"><option>Assembleia</option><option>Manutenção</option><option>Segurança</option><option>Financeiro</option><option>Evento</option><option>Aviso Geral</option></select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-comun')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarComun()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════
+   AUTH
+══════════════════════════ */
+const CRED = {e:'alessandro.lima30', s:'fin102030ale'};
+const $=id=>document.getElementById(id);
+const G=k=>{try{return JSON.parse(localStorage.getItem('apvc4_'+k))}catch{return null}};
+const S=(k,v)=>localStorage.setItem('apvc4_'+k,JSON.stringify(v));
+const charts={};
+
+function doLogin(){
+  const e=$('le').value.trim(), s=$('ls').value.trim();
+  if(e===CRED.e && s===CRED.s){
+    $('login-screen').style.display='none';
+    $('app').style.display='block';
+    const now=new Date();
+    $('tb-date').textContent=now.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'long',year:'numeric'});
+    initApp();
+  } else {
+    $('lerr').style.display='block';
+    $('ls').value='';
+    $('lerr').style.animation='none';
+    setTimeout(()=>$('lerr').style.animation='',50);
+  }
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+
+function doLogout(){
+  $('app').style.display='none';
+  $('login-screen').style.display='flex';
+  $('le').value=''; $('ls').value='';
+}
+
+/* ══ NAVIGATION ══ */
+const panelNames={lotes:'Censo de Lotes',funcionarios:'Funcionários',financeiro:'Financeiro',manutencao:'Manutenção & Serviços',comunicados:'Comunicados & Eventos',preventivas:'Preventivas & Corretivas',reservas:'Gestão de Reservas'};
+function showPanel(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  $('panel-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  $('tb-crumb').textContent=panelNames[id];
+  ({lotes:renderLotes,funcionarios:renderFuncs,financeiro:renderFin,manutencao:renderManut,comunicados:renderComun,preventivas:renderPreventivas,reservas:renderReservas})[id]?.();
+}
+
+function setTab(t){
+  ['org','lista','fkpi'].forEach(v=>$('vw-'+v).style.display='none');
+  ['tab-org','tab-lista','tab-fkpi'].forEach(b=>$('b')?.classList?.remove?.('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  $('tab-'+t).classList.add('active');
+  $('vw-'+t).style.display='block';
+  if(t==='fkpi') renderFKpi();
+}
+
+function mkChart(id,cfg){
+  if(charts[id]) charts[id].destroy();
+  const ctx=$(id); if(!ctx) return;
+  charts[id]=new Chart(ctx,cfg);
+}
+
+function nowM(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+function mLabel(m){const[y,mo]=m.split('-');const s=new Date(y,+mo-1).toLocaleString('pt-BR',{month:'long',year:'numeric'});return s.charAt(0).toUpperCase()+s.slice(1)}
+function mShort(m){const[y,mo]=m.split('-');return new Date(y,+mo-1).toLocaleString('pt-BR',{month:'short',year:'2-digit'})}
+
+function popSel(selId,data,cur){
+  const sel=$(selId); if(!sel) return;
+  const keys=Object.keys(data).sort().reverse();
+  sel.innerHTML='';
+  keys.forEach(m=>{
+    const o=document.createElement('option');
+    o.value=m; o.textContent=mLabel(m);
+    sel.appendChild(o);
+  });
+  if(cur&&data[cur]) sel.value=cur;
+}
+
+function toast(msg){
+  const t=$('toast'); t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._to);
+  t._to=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function closeModal(id){$(id).classList.remove('open')}
+document.querySelectorAll('.modal-ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+
+const fmt=v=>(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+
+/* ═══════ INIT ═══════ */
+function initApp(){
+  initLotes(); initFuncs(); initFin(); initManut(); initComun(); initPrev(); initRes();
+  renderLotes();
+}
+
+/* ══════════════════════════
+   LOTES
+══════════════════════════ */
+function initLotes(){
+  let d=G('lotes')||{};
+  const m=nowM();
+  if(!d[m]) d[m]={total:327,casas:261,apvc:5,obras:11,par:4,terrenos:46,fixos:165,veraneio:96};
+  S('lotes',d);
+  popSel('sel-lm',d,m);
+}
+function renderLotes(){
+  const d=G('lotes')||{}, m=$('sel-lm')?.value||nowM(), r=d[m]||{total:327,casas:261,apvc:5,obras:11,par:4,terrenos:46,fixos:165,veraneio:96};
+  $('lkpi').innerHTML=`
+    <div class="kpi green"><div class="kpi-label">Total de Lotes</div><div class="kpi-val">${r.total}</div><div class="kpi-sub">Condomínio completo</div><div class="kpi-bar"><div class="kpi-bar-fill green" style="width:100%"></div></div></div>
+    <div class="kpi gold"><div class="kpi-label">Casas Construídas</div><div class="kpi-val">${r.casas}</div><div class="kpi-sub">${((r.casas/r.total)*100).toFixed(1)}% do total</div><div class="kpi-bar"><div class="kpi-bar-fill gold" style="width:${(r.casas/r.total)*100}%"></div></div></div>
+    <div class="kpi blue"><div class="kpi-label">Moradores Fixos</div><div class="kpi-val">${r.fixos}</div><div class="kpi-sub">Residência permanente</div><div class="kpi-bar"><div class="kpi-bar-fill blue" style="width:${(r.fixos/r.casas)*100}%"></div></div></div>
+    <div class="kpi teal"><div class="kpi-label">Veraneio</div><div class="kpi-val">${r.veraneio}</div><div class="kpi-sub">Uso temporário</div><div class="kpi-bar"><div class="kpi-bar-fill teal" style="width:${(r.veraneio/r.casas)*100}%"></div></div></div>
+  `;
+  $('lkpi2').innerHTML=`
+    <div class="kpi gold"><div class="kpi-label">Lotes APVC</div><div class="kpi-val">${r.apvc}</div><div class="kpi-sub">Associação</div></div>
+    <div class="kpi amber"><div class="kpi-label">Obras em Andamento</div><div class="kpi-val">${r.obras}</div><div class="kpi-sub">Em construção</div></div>
+    <div class="kpi red"><div class="kpi-label">Obras Paradas</div><div class="kpi-val">${r.par}</div><div class="kpi-sub">Sem atividade</div></div>
+    <div class="kpi purple"><div class="kpi-label">Terrenos Vazios</div><div class="kpi-val">${r.terrenos}</div><div class="kpi-sub">Sem construção</div></div>
+  `;
+  mkChart('ch-lotes-pie',{type:'doughnut',data:{
+    labels:['Casas Construídas','Terrenos Vazios','Obras','Obras Paradas','APVC'],
+    datasets:[{data:[r.casas,r.terrenos,r.obras,r.par,r.apvc],
+      backgroundColor:['#2A9D6F','#C8A84B','#F0A843','#E05252','#5B9CF6'],
+      borderColor:['#1A1E28'],borderWidth:3}]
+  },options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#9BA3AF',font:{size:11},padding:12}}},cutout:'68%'}});
+
+  const keys=Object.keys(d).sort();
+  mkChart('ch-lotes-line',{type:'line',data:{
+    labels:keys.map(mShort),
+    datasets:[{label:'Casas Construídas',data:keys.map(k=>d[k].casas),
+      borderColor:'#C8A84B',backgroundColor:'rgba(200,168,75,0.08)',
+      fill:true,tension:0.4,pointBackgroundColor:'#C8A84B',pointRadius:4,pointHoverRadius:6,borderWidth:2}]
+  },options:{responsive:true,plugins:{legend:{display:false}},scales:{
+    x:{ticks:{color:'#5C6470'},grid:{color:'rgba(255,255,255,0.04)'}},
+    y:{ticks:{color:'#5C6470'},grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:false}
+  }}});
+
+  const tb=$('lhist'); tb.innerHTML='';
+  keys.reverse().forEach(k=>{
+    const r2=d[k];
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><span class="pill pill-gold">${mLabel(k)}</span></td><td>${r2.total}</td><td>${r2.casas}</td><td>${r2.fixos}</td><td>${r2.veraneio}</td><td>${r2.terrenos}</td><td>${r2.obras}</td><td>${r2.par}</td><td>${r2.apvc}</td>`;
+    tb.appendChild(tr);
+  });
+}
+function abrirModalLotes(){
+  const m=$('sel-lm')?.value||nowM(), d=G('lotes')||{}, r=d[m]||{};
+  $('fl-mes').value=m;
+  $('fl-total').value=r.total||327; $('fl-casas').value=r.casas||261;
+  $('fl-fixos').value=r.fixos||165; $('fl-veraneio').value=r.veraneio||96;
+  $('fl-apvc').value=r.apvc||5; $('fl-obras').value=r.obras||11;
+  $('fl-par').value=r.par||4; $('fl-terrenos').value=r.terrenos||46;
+  $('m-lotes').classList.add('open');
+}
+function salvarLotes(){
+  const m=$('fl-mes').value; if(!m) return;
+  const d=G('lotes')||{};
+  d[m]={total:+$('fl-total').value,casas:+$('fl-casas').value,fixos:+$('fl-fixos').value,veraneio:+$('fl-veraneio').value,apvc:+$('fl-apvc').value,obras:+$('fl-obras').value,par:+$('fl-par').value,terrenos:+$('fl-terrenos').value};
+  S('lotes',d); popSel('sel-lm',d,m); closeModal('m-lotes'); renderLotes();
+  toast('✓  Censo de lotes atualizado com sucesso.');
+}
+
+/* ══════════════════════════
+   FUNCIONÁRIOS
+══════════════════════════ */
+function initFuncs(){
+  // Só carrega dados base se ainda não existir nada salvo
+  if(G('funcs')) return;
+  S('funcs',[
+    /* ── Nível 0: Diretoria ── */
+    {id:1,  nome:'Diretoria Executiva',            cargo:'Diretoria Executiva',          dept:'Diretoria',     turno:'Comercial', adm:'2023-01-01', nivel:0, emoji:'🏛️'},
+    /* ── Nível 1: Gestão ── */
+    {id:2,  nome:'Alessandro / Denise',            cargo:'Administração',                dept:'Administração', turno:'Seg–Sex 8h–17h', adm:'2023-01-01', nivel:1, emoji:'👔'},
+    {id:3,  nome:'José Ferreira (Zezinho)',        cargo:'Supervisor de Manutenção',     dept:'Manutenção',    turno:'Seg–Qui 7h–17h / Ter 7h–11h / Sex 7h–16h / Sáb 7h–12h', adm:'2023-01-01', nivel:1, emoji:'🔧'},
+    {id:4,  nome:'Fabricio Briamonte',             cargo:'Coordenador de Segurança',     dept:'Segurança',     turno:'Seg–Qui 7h–17h / Sex 7h–16h', adm:'2023-01-01', nivel:1, emoji:'🛡️'},
+    /* ── Nível 2: Supervisão / Equipes ── */
+    {id:5,  nome:'Simone Faxineira',               cargo:'Faxineira – Sede Social',      dept:'Manutenção',    turno:'Seg–Sex 7h–16h / Sáb 7h–11h', adm:'2023-01-01', nivel:2, emoji:'🧹'},
+    {id:6,  nome:'Adriano Reinoso',                cargo:'Supervisor Intermediário',     dept:'Segurança',     turno:'10h–22h / 12x36', adm:'2023-01-01', nivel:2, emoji:'🔵'},
+    {id:7,  nome:'Romão (Equipe A)',               cargo:'Supervisor de Equipe A',       dept:'Segurança',     turno:'12x36 / 6h–18h', adm:'2023-01-01', nivel:2, emoji:'🟦'},
+    {id:8,  nome:'Donizete (Equipe B)',             cargo:'Supervisor de Equipe B',       dept:'Segurança',     turno:'12x36 / 6h–18h', adm:'2023-01-01', nivel:2, emoji:'🟦'},
+    {id:9,  nome:'Meddiros (Equipe C)',             cargo:'Supervisor de Equipe C',       dept:'Segurança',     turno:'12x36 / 18h–6h', adm:'2023-01-01', nivel:2, emoji:'🟦'},
+    {id:10, nome:'Vian (Equipe D)',                cargo:'Supervisor de Equipe D',       dept:'Segurança',     turno:'12x36 / 18h–6h', adm:'2023-01-01', nivel:2, emoji:'🟦'},
+    /* ── Nível 3: Operacional Manutenção ── */
+    {id:11, nome:'Haroldo',                        cargo:'Aux. Conservação/Manutenção',  dept:'Manutenção',    turno:'Seg–Qui 7h–17h / Sex 7h–16h', adm:'2023-01-01', nivel:3, emoji:'🛠️'},
+    {id:12, nome:'Ivanilton',                      cargo:'Aux. Conservação/Manutenção',  dept:'Manutenção',    turno:'Seg–Qui 7h–17h / Sex 7h–16h', adm:'2023-01-01', nivel:3, emoji:'🛠️'},
+    {id:13, nome:'João Dias de Oliveira',          cargo:'Ajudante Geral',              dept:'Manutenção',    turno:'Seg–Qui 7h–17h / Sex 7h–16h', adm:'2023-01-01', nivel:3, emoji:'🛠️'},
+    {id:14, nome:'José Erivaldo Pontes Fernandes', cargo:'Aux. Conservação/Manutenção',  dept:'Manutenção',    turno:'Seg–Qui 7h–17h / Sex 7h–16h', adm:'2023-01-01', nivel:3, emoji:'🛠️'},
+    {id:15, nome:'Givaldo Paulino Miranda',        cargo:'Ajudante Geral',              dept:'Manutenção',    turno:'Seg–Qui 7h–17h / Sex 7h–16h', adm:'2023-01-01', nivel:3, emoji:'🛠️'},
+    {id:16, nome:'Vinícius Moreira de Araujo Jr.', cargo:'Aux. Conservação/Manutenção',  dept:'Manutenção',    turno:'Seg–Qui 7h–17h / Sex 7h–16h', adm:'2023-01-01', nivel:3, emoji:'🛠️'},
+    {id:17, nome:'Ivanilton Moreira de Araujo',    cargo:'Ajudante Geral',              dept:'Manutenção',    turno:'Seg–Qui 7h–17h / Sex 7h–16h', adm:'2023-01-01', nivel:3, emoji:'🛠️'},
+    {id:18, nome:'Haróldo Gonçalves',              cargo:'Ajudante Geral',              dept:'Manutenção',    turno:'Seg–Qui 7h–17h / Sex 7h–16h', adm:'2023-01-01', nivel:3, emoji:'🛠️'},
+    {id:19, nome:'Reginaldo Ferreira',             cargo:'½ Oficial de Manutenção',     dept:'Manutenção',    turno:'Seg–Qui 7h–17h / Sex 7h–16h', adm:'2023-01-01', nivel:3, emoji:'🛠️'},
+    /* ── Nível 3: Setor de Encomendas ── */
+    {id:20, nome:'Patricia',                       cargo:'Setor de Encomendas',         dept:'Segurança',     turno:'Seg–Sex 9h–18h / Sáb 8h–12h', adm:'2023-01-01', nivel:3, emoji:'📦'},
+    /* ── Nível 3: Porteiros/Vigias – Equipes ── */
+    {id:21, nome:'Cássio Gabriel',                 cargo:'Porteiro/Vigia Motorizado',   dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:22, nome:'Diogo Talhaferro',               cargo:'Porteiro/Vigia Motorizado',   dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:23, nome:'Maria Aparecida',                cargo:'Porteiro/Vigia Motorizado',   dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:24, nome:'Silvanio de Paula',              cargo:'Vigia Motorizado',            dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:25, nome:'Alex Macedo',                    cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:26, nome:'Darlan Santos',                  cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:27, nome:'Igor Leonardo',                  cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:28, nome:'João Rafael',                    cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:29, nome:'Patricia dos Santos',            cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:30, nome:'Wagner Nunes',                   cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:31, nome:'Rony Charles',                   cargo:'Vigia',                       dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:32, nome:'José Edvan',                     cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:33, nome:'Alisson Rodrigues',              cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:34, nome:'André de Melo',                  cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:35, nome:'Jorge Avelino',                  cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:36, nome:'Joramir Oliveira',               cargo:'Vigia',                       dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:37, nome:'Antonio Edmar',                  cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:38, nome:'Marcelo Godinho',                cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:39, nome:'Marcos Zanardo',                 cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:40, nome:'Lucas Rodrigues',                cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:41, nome:'Armando José',                   cargo:'Vigia',                       dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:42, nome:'Kleber Brandão',                 cargo:'Vigia',                       dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:43, nome:'Jefferson Brito',                cargo:'Porteiro',                    dept:'Segurança',     turno:'12x36', adm:'2023-01-01', nivel:3, emoji:'🚪'},
+    {id:44, nome:'Patricia Gonçalves',             cargo:'Aux. Guarda Transitória',     dept:'Segurança',     turno:'Variável', adm:'2023-01-01', nivel:3, emoji:'🔒'},
+  ]);
+}
+function renderFuncs(){renderOrg(); renderFTabela();}
+function renderOrg(){
+  const fs=G('funcs')||[], wrap=$('org-wrap'); wrap.innerHTML='';
+  [0,1,2,3].forEach(lv=>{
+    const grupo=fs.filter(f=>f.nivel==lv); if(!grupo.length) return;
+    if(lv>0){const ln=document.createElement('div');ln.className='org-line-v';wrap.appendChild(ln);}
+    const row=document.createElement('div'); row.className='org-level';
+    grupo.forEach(f=>{
+      const c=document.createElement('div'); c.className=`org-card n${lv}`;
+      c.onclick=()=>abrirModalFunc(f.id);
+      c.innerHTML=`<span class="oc-emoji">${f.emoji||'👤'}</span><div class="oc-name">${f.nome}</div><div class="oc-role">${f.cargo}</div>`;
+      row.appendChild(c);
+    });
+    wrap.appendChild(row);
+  });
+}
+function renderFTabela(){
+  const fs=G('funcs')||[], tb=$('ftbody'); tb.innerHTML='';
+  fs.forEach(f=>{
+    const tr=document.createElement('tr');
+    const admFmt=f.adm?new Date(f.adm+'T00:00').toLocaleDateString('pt-BR'):'—';
+    tr.innerHTML=`<td><strong>${f.emoji} ${f.nome}</strong></td><td>${f.cargo}</td><td><span class="pill pill-blue">${f.dept}</span></td><td>${f.turno}</td><td>${admFmt}</td>
+    <td><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="abrirModalFunc(${f.id})">✏️</button><button class="btn btn-red btn-sm" onclick="excluirFunc(${f.id})">🗑️</button></div></td>`;
+    tb.appendChild(tr);
+  });
+}
+function renderFKpi(){
+  const fs=G('funcs')||[];
+  const depts={}, turnos={};
+  fs.forEach(f=>{depts[f.dept]=(depts[f.dept]||0)+1; turnos[f.turno]=(turnos[f.turno]||0)+1;});
+  $('fkpi').innerHTML=`
+    <div class="kpi gold"><div class="kpi-label">Total Colaboradores</div><div class="kpi-val">${fs.length}</div></div>
+    <div class="kpi blue"><div class="kpi-label">Departamentos</div><div class="kpi-val">${Object.keys(depts).length}</div></div>
+    <div class="kpi green"><div class="kpi-label">Turnos Ativos</div><div class="kpi-val">${Object.keys(turnos).length}</div></div>
+  `;
+  const COLORS=['#C8A84B','#2A9D6F','#5B9CF6','#F0A843','#A78BFA','#2DD4BF','#E05252'];
+  mkChart('ch-fdept',{type:'bar',data:{
+    labels:Object.keys(depts),
+    datasets:[{data:Object.values(depts),backgroundColor:COLORS,borderRadius:6,borderSkipped:false}]
+  },options:{responsive:true,plugins:{legend:{display:false}},scales:{
+    x:{ticks:{color:'#5C6470'},grid:{display:false}},
+    y:{ticks:{color:'#5C6470',stepSize:1},grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true}
+  }}});
+  mkChart('ch-fturno',{type:'doughnut',data:{
+    labels:Object.keys(turnos),
+    datasets:[{data:Object.values(turnos),backgroundColor:COLORS,borderColor:['#1A1E28'],borderWidth:3}]
+  },options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#9BA3AF',font:{size:11},padding:10}}},cutout:'62%'}});
+}
+function abrirModalFunc(id){
+  const fs=G('funcs')||[], f=id?fs.find(x=>x.id===id):null;
+  $('mf-t').textContent=f?'Editar Colaborador':'Novo Colaborador';
+  $('mf-id').value=f?.id||''; $('mf-nome').value=f?.nome||'';
+  $('mf-cargo').value=f?.cargo||''; $('mf-dept').value=f?.dept||'Segurança';
+  $('mf-turno').value=f?.turno||'Diurno'; $('mf-adm').value=f?.adm||'';
+  $('mf-nivel').value=f?.nivel??2; $('mf-emoji').value=f?.emoji||'👤';
+  $('m-func').classList.add('open');
+}
+function salvarFunc(){
+  const fs=G('funcs')||[], id=$('mf-id').value;
+  const obj={id:id?+id:Date.now(),nome:$('mf-nome').value,cargo:$('mf-cargo').value,dept:$('mf-dept').value,turno:$('mf-turno').value,adm:$('mf-adm').value,nivel:+$('mf-nivel').value,emoji:$('mf-emoji').value||'👤'};
+  if(id){const i=fs.findIndex(f=>f.id===+id);if(i>=0)fs[i]=obj;}else fs.push(obj);
+  S('funcs',fs); closeModal('m-func'); renderFuncs(); toast('✓  Colaborador salvo.');
+}
+function excluirFunc(id){
+  if(!confirm('Remover este colaborador?')) return;
+  S('funcs',(G('funcs')||[]).filter(f=>f.id!==id)); renderFuncs();
+  toast('✓  Colaborador removido.');
+}
+
+/* ══════════════════════════
+   FINANCEIRO
+══════════════════════════ */
+function initFin(){
+  if(!G('fin')){
+    const d={};
+    ['2026-01','2026-02','2026-03','2026-04'].forEach((m,i)=>{
+      d[m]={taxa:85000+i*2000,multas:3200+i*300,outrec:1500,folha:32000,manut:8000+i*500,util:5500,seg:4000,adm:2500,outdesp:1000};
+    });
+    S('fin',d);
+  }
+  popSel('sel-fm',G('fin'),nowM());
+}
+function renderFin(){
+  const d=G('fin')||{}, m=$('sel-fm')?.value||nowM(), r=d[m]||{};
+  const rec=(r.taxa||0)+(r.multas||0)+(r.outrec||0);
+  const desp=(r.folha||0)+(r.manut||0)+(r.util||0)+(r.seg||0)+(r.adm||0)+(r.outdesp||0);
+  const saldo=rec-desp;
+  $('finkpi').innerHTML=`
+    <div class="kpi green"><div class="kpi-label">Receita Total</div><div class="kpi-val" style="font-size:26px">${fmt(rec)}</div><div class="kpi-sub" style="color:#3DC68D">↑ Entrada do mês</div></div>
+    <div class="kpi red"><div class="kpi-label">Despesa Total</div><div class="kpi-val" style="font-size:26px">${fmt(desp)}</div><div class="kpi-sub" style="color:#E05252">↓ Saída do mês</div></div>
+    <div class="kpi ${saldo>=0?'gold':'red'}"><div class="kpi-label">Saldo do Mês</div><div class="kpi-val ${saldo>=0?'saldo-pos':'saldo-neg'}" style="font-size:26px">${fmt(saldo)}</div><div class="kpi-sub">${saldo>=0?'✓ Superávit':'⚠ Déficit'}</div></div>
+  `;
+  const keys=Object.keys(d).sort().slice(-6);
+  const recArr=keys.map(k=>{const r2=d[k]||{};return(r2.taxa||0)+(r2.multas||0)+(r2.outrec||0)});
+  const despArr=keys.map(k=>{const r2=d[k]||{};return(r2.folha||0)+(r2.manut||0)+(r2.util||0)+(r2.seg||0)+(r2.adm||0)+(r2.outdesp||0)});
+  mkChart('ch-fin-bar',{type:'bar',data:{
+    labels:keys.map(mShort),
+    datasets:[
+      {label:'Receitas',data:recArr,backgroundColor:'rgba(42,157,111,0.7)',borderRadius:6,borderSkipped:false},
+      {label:'Despesas',data:despArr,backgroundColor:'rgba(200,168,75,0.7)',borderRadius:6,borderSkipped:false}
+    ]
+  },options:{responsive:true,plugins:{legend:{labels:{color:'#9BA3AF',font:{size:11}}}},scales:{
+    x:{ticks:{color:'#5C6470'},grid:{display:false}},
+    y:{ticks:{color:'#5C6470',callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true}
+  }}});
+  mkChart('ch-fin-pie',{type:'doughnut',data:{
+    labels:['Folha','Manutenção','Água/Energia','Segurança','Administrativo','Outros'],
+    datasets:[{data:[r.folha||0,r.manut||0,r.util||0,r.seg||0,r.adm||0,r.outdesp||0],
+      backgroundColor:['#2A9D6F','#C8A84B','#5B9CF6','#E05252','#A78BFA','#5C6470'],
+      borderColor:['#1A1E28'],borderWidth:3}]
+  },options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#9BA3AF',font:{size:11},padding:10}}},cutout:'62%'}});
+
+  $('fin-rec').innerHTML=`
+    <div class="fin-row"><span class="fin-row-name">Taxa Condominial</span><span class="fin-row-val rec">${fmt(r.taxa)}</span></div>
+    <div class="fin-row"><span class="fin-row-name">Multas e Juros</span><span class="fin-row-val rec">${fmt(r.multas)}</span></div>
+    <div class="fin-row"><span class="fin-row-name">Outras Receitas</span><span class="fin-row-val rec">${fmt(r.outrec)}</span></div>
+    <div class="fin-row" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;margin-top:4px"><span class="fin-row-name" style="font-weight:600;color:var(--text)">Total</span><span class="fin-row-val rec" style="font-size:16px">${fmt(rec)}</span></div>
+  `;
+  $('fin-desp').innerHTML=`
+    <div class="fin-row"><span class="fin-row-name">Folha de Pagamento</span><span class="fin-row-val desp">${fmt(r.folha)}</span></div>
+    <div class="fin-row"><span class="fin-row-name">Manutenção</span><span class="fin-row-val desp">${fmt(r.manut)}</span></div>
+    <div class="fin-row"><span class="fin-row-name">Água e Energia</span><span class="fin-row-val desp">${fmt(r.util)}</span></div>
+    <div class="fin-row"><span class="fin-row-name">Segurança</span><span class="fin-row-val desp">${fmt(r.seg)}</span></div>
+    <div class="fin-row"><span class="fin-row-name">Administrativo</span><span class="fin-row-val desp">${fmt(r.adm)}</span></div>
+    <div class="fin-row"><span class="fin-row-name">Outras Despesas</span><span class="fin-row-val desp">${fmt(r.outdesp)}</span></div>
+    <div class="fin-row" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;margin-top:4px"><span class="fin-row-name" style="font-weight:600;color:var(--text)">Total</span><span class="fin-row-val desp" style="font-size:16px">${fmt(desp)}</span></div>
+  `;
+}
+function abrirModalFin(){
+  const m=$('sel-fm')?.value||nowM(), d=G('fin')||{}, r=d[m]||{};
+  $('ff-mes').value=m;
+  ['taxa','multas','outrec','folha','manut','util','seg','adm','outdesp'].forEach(k=>$('ff-'+k).value=r[k]||0);
+  $('m-fin').classList.add('open');
+}
+function salvarFin(){
+  const m=$('ff-mes').value; if(!m) return;
+  const d=G('fin')||{};
+  d[m]={taxa:+$('ff-taxa').value,multas:+$('ff-multas').value,outrec:+$('ff-outrec').value,folha:+$('ff-folha').value,manut:+$('ff-manut').value,util:+$('ff-util').value,seg:+$('ff-seg').value,adm:+$('ff-adm').value,outdesp:+$('ff-outdesp').value};
+  S('fin',d); popSel('sel-fm',d,m); closeModal('m-fin'); renderFin();
+  toast('✓  Financeiro atualizado.');
+}
+
+/* ══════════════════════════
+   MANUTENÇÃO
+══════════════════════════ */
+function initManut(){
+  if(!G('manut')) S('manut',[
+    {id:1,tit:'Manutenção Preventiva — Portões',desc:'Lubrificação e ajuste dos portões eletrônicos da entrada principal.',prio:'ok',data:'2026-04-10',resp:'Zelador Geral'},
+    {id:2,tit:'Troca de Lâmpadas — Área de Lazer',desc:'Substituição de 12 lâmpadas LED na quadra e playground.',prio:'pendente',data:'2026-04-25',resp:'Aux. Manutenção'},
+    {id:3,tit:'Revisão da Bomba d\'Água',desc:'Inspeção e revisão completa da bomba principal do lago artificial.',prio:'urgente',data:'2026-04-30',resp:'Zelador Geral'},
+    {id:4,tit:'Pintura do Salão de Festas',desc:'Repintura das paredes internas do salão de festas.',prio:'pendente',data:'2026-05-15',resp:'Terceirizado'},
+  ]);
+}
+function renderManut(){
+  const its=G('manut')||[];
+  const ok=its.filter(i=>i.prio==='ok').length, pend=its.filter(i=>i.prio==='pendente').length, urg=its.filter(i=>i.prio==='urgente').length;
+  $('mkpi').innerHTML=`
+    <div class="kpi gold"><div class="kpi-label">Total de Ordens</div><div class="kpi-val">${its.length}</div></div>
+    <div class="kpi green"><div class="kpi-label">Concluídas</div><div class="kpi-val">${ok}</div></div>
+    <div class="kpi amber"><div class="kpi-label">Pendentes</div><div class="kpi-val">${pend}</div></div>
+    <div class="kpi red"><div class="kpi-label">Urgentes</div><div class="kpi-val">${urg}</div></div>
+  `;
+  const lista=$('mlista'); lista.innerHTML='';
+  const prioMap={urgente:0,pendente:1,ok:2};
+  [...its].sort((a,b)=>prioMap[a.prio]-prioMap[b.prio]).forEach(it=>{
+    const div=document.createElement('div');div.className='manut-item';
+    const emojiPrio={ok:'✅',pendente:'🟡',urgente:'🔴'}[it.prio];
+    const dt=it.data?new Date(it.data+'T00:00').toLocaleDateString('pt-BR'):'';
+    div.innerHTML=`<div class="manut-prio mp-${it.prio}">${emojiPrio}</div>
+      <div style="flex:1"><div class="manut-title">${it.tit}</div><div class="manut-desc">${it.desc} · ${it.resp} · ${dt}</div></div>
+      <div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="abrirModalManut(${it.id})">✏️</button><button class="btn btn-red btn-sm" onclick="excluirManut(${it.id})">🗑️</button></div>`;
+    lista.appendChild(div);
+  });
+}
+function abrirModalManut(id){
+  const its=G('manut')||[], it=id?its.find(i=>i.id===id):null;
+  $('mm-t').textContent=it?'Editar Ordem':'Nova Ordem de Serviço';
+  $('mm-id').value=it?.id||''; $('mm-tit').value=it?.tit||'';
+  $('mm-desc').value=it?.desc||''; $('mm-prio').value=it?.prio||'pendente';
+  $('mm-data').value=it?.data||''; $('mm-resp').value=it?.resp||'';
+  $('m-manut').classList.add('open');
+}
+function salvarManut(){
+  const its=G('manut')||[], id=$('mm-id').value;
+  const obj={id:id?+id:Date.now(),tit:$('mm-tit').value,desc:$('mm-desc').value,prio:$('mm-prio').value,data:$('mm-data').value,resp:$('mm-resp').value};
+  if(id){const i=its.findIndex(x=>x.id===+id);if(i>=0)its[i]=obj;}else its.push(obj);
+  S('manut',its); closeModal('m-manut'); renderManut(); toast('✓  Ordem de serviço salva.');
+}
+function excluirManut(id){
+  if(!confirm('Remover esta ordem?')) return;
+  S('manut',(G('manut')||[]).filter(i=>i.id!==id)); renderManut();
+  toast('✓  Ordem removida.');
+}
+
+/* ══════════════════════════
+   COMUNICADOS
+══════════════════════════ */
+function initComun(){
+  if(!G('comun')) S('comun',[
+    {id:1,tit:'Assembleia Geral Ordinária 2026',desc:'Convocação para a AGO. Todos os condôminos estão convocados. Pauta disponível na portaria.',data:'2026-04-18',cat:'Assembleia'},
+    {id:2,tit:'Manutenção do Lago — Aviso',desc:'O lago estará interditado para limpeza e manutenção nos dias 22 e 23 de abril.',data:'2026-04-22',cat:'Manutenção'},
+    {id:3,tit:'Novo Sistema de Acesso — Facial',desc:'A partir de maio o acesso pela portaria será por reconhecimento facial. Cadastros serão agendados em breve.',data:'2026-05-01',cat:'Segurança'},
+    {id:4,tit:'Festejo Junino APVC 2026',desc:'Convidamos todos para o Festejo Junino. Forró, comidas típicas e prêmios. Entrada livre para moradores.',data:'2026-06-14',cat:'Evento'},
+  ]);
+}
+function renderComun(){
+  const its=G('comun')||[];
+  const cats={};its.forEach(i=>{cats[i.cat]=(cats[i.cat]||0)+1});
+  $('ckpi').innerHTML=`
+    <div class="kpi gold"><div class="kpi-label">Total Comunicados</div><div class="kpi-val">${its.length}</div></div>
+    <div class="kpi blue"><div class="kpi-label">Assembleias</div><div class="kpi-val">${cats['Assembleia']||0}</div></div>
+    <div class="kpi amber"><div class="kpi-label">Eventos</div><div class="kpi-val">${cats['Evento']||0}</div></div>
+    <div class="kpi teal"><div class="kpi-label">Avisos Técnicos</div><div class="kpi-val">${(cats['Manutenção']||0)+(cats['Segurança']||0)+(cats['Financeiro']||0)}</div></div>
+  `;
+  const lista=$('clista'); lista.innerHTML='';
+  const pillCls={Assembleia:'pill-gold',Manutenção:'pill-amber',Segurança:'pill-blue',Financeiro:'pill-green',Evento:'pill-green','Aviso Geral':'pill-blue'};
+  [...its].sort((a,b)=>new Date(b.data)-new Date(a.data)).forEach(it=>{
+    const d=new Date(it.data+'T00:00');
+    const div=document.createElement('div');div.className='comun-item';
+    div.innerHTML=`<div class="comun-date"><div class="cd-day">${String(d.getDate()).padStart(2,'0')}</div><div class="cd-mon">${d.toLocaleString('pt-BR',{month:'short'})}</div></div>
+      <div class="comun-body" style="flex:1"><div class="comun-title">${it.tit} <span class="pill ${pillCls[it.cat]||'pill-blue'}">${it.cat}</span></div><div class="comun-desc">${it.desc}</div></div>
+      <div style="display:flex;gap:6px;align-items:center"><button class="btn btn-ghost btn-sm" onclick="abrirModalComun(${it.id})">✏️</button><button class="btn btn-red btn-sm" onclick="excluirComun(${it.id})">🗑️</button></div>`;
+    lista.appendChild(div);
+  });
+}
+function abrirModalComun(id){
+  const its=G('comun')||[], it=id?its.find(i=>i.id===id):null;
+  $('mc-t').textContent=it?'Editar Comunicado':'Novo Comunicado';
+  $('mc-id').value=it?.id||''; $('mc-tit').value=it?.tit||'';
+  $('mc-desc').value=it?.desc||''; $('mc-data').value=it?.data||'';
+  $('mc-cat').value=it?.cat||'Aviso Geral';
+  $('m-comun').classList.add('open');
+}
+function salvarComun(){
+  const its=G('comun')||[], id=$('mc-id').value;
+  const obj={id:id?+id:Date.now(),tit:$('mc-tit').value,desc:$('mc-desc').value,data:$('mc-data').value,cat:$('mc-cat').value};
+  if(id){const i=its.findIndex(x=>x.id===+id);if(i>=0)its[i]=obj;}else its.push(obj);
+  S('comun',its); closeModal('m-comun'); renderComun(); toast('✓  Comunicado salvo.');
+}
+
+/* ══════════════════════════
+   PREVENTIVAS & CORRETIVAS
+══════════════════════════ */
+function initPrev(){
+  if(!G('prev')) S('prev',[]);
+}
+function renderPreventivas(){
+  const all=G('prev')||[];
+  const busca=($('prev-busca')?.value||'').toLowerCase();
+  const filtroTipo=$('prev-filtro-tipo')?.value||'';
+  const filtroStatus=$('prev-filtro-status')?.value||'';
+  const filtroLocal=$('prev-filtro-local')?.value||'';
+  const dataIni=$('prev-data-ini')?.value||'';
+  const dataFim=$('prev-data-fim')?.value||'';
+  const its=all.filter(i=>{
+    const txt=(i.tit+' '+(i.obs||'')+' '+(i.resp||'')+' '+(i.local||'')).toLowerCase();
+    const dataRef=i.dataAbertura||'';
+    return (!busca||txt.includes(busca))
+      &&(!filtroTipo||i.tipo===filtroTipo)
+      &&(!filtroStatus||i.status===filtroStatus)
+      &&(!filtroLocal||i.local===filtroLocal)
+      &&(!dataIni||dataRef>=dataIni)
+      &&(!dataFim||dataRef<=dataFim);
+  });
+  const prev=all.filter(i=>i.tipo==='Preventiva').length;
+  const corr=all.filter(i=>i.tipo==='Corretiva').length;
+  const conc=all.filter(i=>i.status==='concluida').length;
+  const pend=all.filter(i=>i.status==='pendente').length;
+  const urg=all.filter(i=>i.prio==='urgente'&&i.status!=='concluida').length;
+  $('pvkpi').innerHTML=`
+    <div class="kpi gold"><div class="kpi-label">Total</div><div class="kpi-val">${all.length}</div></div>
+    <div class="kpi blue"><div class="kpi-label">Preventivas</div><div class="kpi-val">${prev}</div></div>
+    <div class="kpi amber"><div class="kpi-label">Corretivas</div><div class="kpi-val">${corr}</div></div>
+    <div class="kpi green"><div class="kpi-label">Concluídas</div><div class="kpi-val">${conc}</div></div>
+    <div class="kpi red"><div class="kpi-label">Urgentes Abertas</div><div class="kpi-val">${urg}</div></div>
+    <div class="kpi amber"><div class="kpi-label">Pendentes</div><div class="kpi-val">${pend}</div></div>
+  `;
+  const lista=$('pvlista'); lista.innerHTML='';
+  if(!its.length){lista.innerHTML='<div style="padding:32px;text-align:center;color:var(--text-2)">Nenhum registro encontrado.</div>';return;}
+  const prioOrd={urgente:0,alta:1,media:2,baixa:3};
+  const statusOrd={pendente:0,em_andamento:1,concluida:2};
+  [...its].sort((a,b)=>statusOrd[a.status]-statusOrd[b.status]||prioOrd[a.prio]-prioOrd[b.prio]).forEach(it=>{
+    const div=document.createElement('div');
+    div.className='manut-item';
+    const tipoPill=it.tipo==='Preventiva'?'pill-blue':'pill-amber';
+    const statusMap={pendente:['🟡','pill-amber','Pendente'],em_andamento:['🔵','pill-blue','Em Andamento'],concluida:['✅','pill-green','Concluída']};
+    const prioMap={baixa:'🟢',media:'🟡',alta:'🟠',urgente:'🔴'};
+    const [sEmoji,sPill,sLabel]=statusMap[it.status]||['🟡','pill-amber','Pendente'];
+    const dataAb=it.dataAbertura?new Date(it.dataAbertura+'T00:00').toLocaleDateString('pt-BR'):'—';
+    const dataPv=it.dataPrev?new Date(it.dataPrev+'T00:00').toLocaleDateString('pt-BR'):'—';
+    const custo=it.custo>0?`R$ ${parseFloat(it.custo).toLocaleString('pt-BR',{minimumFractionDigits:2})}`:'—';
+    div.innerHTML=`
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:40px">
+        <span style="font-size:20px">${prioMap[it.prio]||'🟡'}</span>
+        <span style="font-size:10px;color:var(--text-2);text-transform:capitalize">${it.prio||''}</span>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div class="manut-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          ${it.tit}
+          <span class="pill ${tipoPill}">${it.tipo}</span>
+          <span class="pill ${sPill}">${sEmoji} ${sLabel}</span>
+        </div>
+        <div class="manut-desc" style="margin-top:5px;display:flex;flex-wrap:wrap;gap:10px">
+          <span>📍 ${it.local||'—'}</span>
+          <span>👤 ${it.resp||'—'}</span>
+          <span>📅 Abertura: ${dataAb}</span>
+          <span>🏁 Previsão: ${dataPv}</span>
+          <span>💰 ${custo}</span>
+        </div>
+        ${it.obs?`<div style="margin-top:6px;font-size:13px;color:var(--text-2);font-style:italic;border-left:2px solid var(--border-h);padding-left:8px">${it.obs}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;align-items:flex-start">
+        <button class="btn btn-ghost btn-sm" onclick="abrirModalPrev(${it.id})">✏️</button>
+        <button class="btn btn-red btn-sm" onclick="excluirPrev(${it.id})">🗑️</button>
+      </div>`;
+    lista.appendChild(div);
+  });
+}
+function limparFiltrosPrev(){
+  $('prev-busca').value='';
+  $('prev-filtro-tipo').value='';
+  $('prev-filtro-status').value='';
+  $('prev-filtro-local').value='';
+  $('prev-data-ini').value='';
+  $('prev-data-fim').value='';
+  renderPreventivas();
+}
+function abrirModalPrev(id){
+  const its=G('prev')||[], it=id?its.find(i=>i.id===id):null;
+  $('mpv-t').textContent=it?'Editar Registro':'Novo Registro';
+  $('mpv-id').value=it?.id||'';
+  $('mpv-tit').value=it?.tit||'';
+  $('mpv-tipo').value=it?.tipo||'Preventiva';
+  $('mpv-status').value=it?.status||'pendente';
+  $('mpv-local').value=it?.local||'Geral';
+  $('mpv-prio').value=it?.prio||'media';
+  $('mpv-data-abertura').value=it?.dataAbertura||new Date().toISOString().slice(0,10);
+  $('mpv-data-prev').value=it?.dataPrev||'';
+  $('mpv-resp').value=it?.resp||'';
+  $('mpv-custo').value=it?.custo||'';
+  $('mpv-obs').value=it?.obs||'';
+  $('m-prev').classList.add('open');
+}
+function salvarPrev(){
+  if(!$('mpv-tit').value.trim()){toast('⚠️ Informe o título.'); return;}
+  const its=G('prev')||[], id=$('mpv-id').value;
+  const obj={
+    id:id?+id:Date.now(),
+    tit:$('mpv-tit').value.trim(),
+    tipo:$('mpv-tipo').value,
+    status:$('mpv-status').value,
+    local:$('mpv-local').value,
+    prio:$('mpv-prio').value,
+    dataAbertura:$('mpv-data-abertura').value,
+    dataPrev:$('mpv-data-prev').value,
+    resp:$('mpv-resp').value.trim(),
+    custo:parseFloat($('mpv-custo').value)||0,
+    obs:$('mpv-obs').value.trim(),
+  };
+  if(id){const i=its.findIndex(x=>x.id===+id);if(i>=0)its[i]=obj;}else its.push(obj);
+  S('prev',its); closeModal('m-prev'); renderPreventivas(); toast('✓  Registro salvo.');
+}
+function excluirPrev(id){
+  if(!confirm('Remover este registro?')) return;
+  S('prev',(G('prev')||[]).filter(i=>i.id!==id)); renderPreventivas();
+  toast('✓  Registro removido.');
+}
+
+/* ══════════════════════════
+   RESERVAS
+══════════════════════════ */
+const ESPACOS_EMOJI={
+  'Quadra de Areia':'🏐','Quadra de Tennis':'🎾','Quadra de Saibro':'🎾',
+  'Ginásio':'🏋️','Campo':'⚽','Sala de Jogos':'🎱',
+  'Quiosque':'🌴','Sede Social':'🏛️','Cozinha / Espaço Lazer':'🍽️'
+};
+function initRes(){
+  if(!G('reservas')) S('reservas',[]);
+}
+function renderReservas(){
+  const all=G('reservas')||[];
+  const busca=($('res-busca')?.value||'').toLowerCase();
+  const fEsp=$('res-f-espaco')?.value||'';
+  const fSt=$('res-f-status')?.value||'';
+  const fIni=$('res-f-ini')?.value||'';
+  const fFim=$('res-f-fim')?.value||'';
+  const ordem=$('res-ordem')?.value||'data_desc';
+
+  const its=all.filter(r=>{
+    const txt=((r.nome||'')+(r.lote||'')+(r.obs||'')+(r.finalidade||'')).toLowerCase();
+    return (!busca||txt.includes(busca))
+      &&(!fEsp||r.espaco===fEsp)
+      &&(!fSt||r.status===fSt)
+      &&(!fIni||r.data>=fIni)
+      &&(!fFim||r.data<=fFim);
+  });
+
+  // Sort
+  its.sort((a,b)=>{
+    if(ordem==='data_asc') return (a.data||'').localeCompare(b.data||'');
+    if(ordem==='data_desc') return (b.data||'').localeCompare(a.data||'');
+    if(ordem==='espaco') return (a.espaco||'').localeCompare(b.espaco||'');
+    if(ordem==='status'){const o={pendente:0,confirmada:1,realizada:2,cancelada:3};return (o[a.status]||0)-(o[b.status]||0);}
+    return 0;
+  });
+
+  // KPIs
+  const conf=all.filter(r=>r.status==='confirmada').length;
+  const pend=all.filter(r=>r.status==='pendente').length;
+  const real=all.filter(r=>r.status==='realizada').length;
+  const canc=all.filter(r=>r.status==='cancelada').length;
+  const hoje=new Date().toISOString().slice(0,10);
+  const hj=all.filter(r=>r.data===hoje).length;
+  const receitaTotal=all.reduce((s,r)=>(r.pgto==='pago'?s+(parseFloat(r.taxa)||0):s),0);
+  $('res-kpi').innerHTML=`
+    <div class="kpi gold"><div class="kpi-label">Total de Reservas</div><div class="kpi-val">${all.length}</div></div>
+    <div class="kpi blue"><div class="kpi-label">Confirmadas</div><div class="kpi-val">${conf}</div></div>
+    <div class="kpi amber"><div class="kpi-label">Pendentes</div><div class="kpi-val">${pend}</div></div>
+    <div class="kpi green"><div class="kpi-label">Realizadas</div><div class="kpi-val">${real}</div></div>
+    <div class="kpi red"><div class="kpi-label">Canceladas</div><div class="kpi-val">${canc}</div></div>
+    <div class="kpi gold"><div class="kpi-label">Hoje</div><div class="kpi-val">${hj}</div></div>
+    <div class="kpi green"><div class="kpi-label">Receita (taxas pagas)</div><div class="kpi-val" style="font-size:16px">${receitaTotal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</div></div>
+  `;
+
+  const lista=$('res-lista'); lista.innerHTML='';
+  if(!its.length){
+    lista.innerHTML='<div style="padding:36px;text-align:center;color:var(--text-2)">Nenhuma reserva encontrada.</div>';
+    return;
+  }
+
+  const stMap={
+    confirmada:{pill:'pill-green',label:'✅ Confirmada'},
+    pendente:{pill:'pill-amber',label:'🟡 Pendente'},
+    cancelada:{pill:'pill-red',label:'❌ Cancelada'},
+    realizada:{pill:'pill-blue',label:'🏁 Realizada'},
+  };
+  const pgtoMap={pago:'💚 Pago',pendente:'🟡 Pendente',isento:'🔵 Isento'};
+
+  its.forEach(r=>{
+    const div=document.createElement('div');
+    div.style.cssText='border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;background:var(--card);transition:border-color 0.2s';
+    div.onmouseenter=()=>div.style.borderColor='var(--border-h)';
+    div.onmouseleave=()=>div.style.borderColor='var(--border)';
+
+    const st=stMap[r.status]||{pill:'pill-amber',label:'🟡 Pendente'};
+    const emoji=ESPACOS_EMOJI[r.espaco]||'📍';
+    const dataFmt=r.data?new Date(r.data+'T00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}):'—';
+    const taxa=r.taxa>0?`R$ ${parseFloat(r.taxa).toLocaleString('pt-BR',{minimumFractionDigits:2})}`:'—';
+    const caucao=r.caucao>0?`R$ ${parseFloat(r.caucao).toLocaleString('pt-BR',{minimumFractionDigits:2})}`:'—';
+
+    // Checklist badges
+    const chks=[
+      {ok:r.chkTermo,    label:'Termo'},
+      {ok:r.chkVPre,     label:'Vistoria Pré'},
+      {ok:r.chkVPos,     label:'Vistoria Pós'},
+      {ok:r.chkCaucaoDev,label:'Caução Dev.'},
+      {ok:r.chkRegras,   label:'Regras'},
+      {ok:r.chkDevolucao,label:'Chave Dev.'},
+    ];
+    const chkHtml=chks.map(c=>`
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;
+        background:${c.ok?'rgba(42,157,111,0.15)':'rgba(255,255,255,0.04)'};
+        color:${c.ok?'var(--green-l)':'var(--text-3)'};
+        border:1px solid ${c.ok?'rgba(42,157,111,0.3)':'var(--border)'}">${c.ok?'✓':'○'} ${c.label}</span>
+    `).join('');
+
+    div.innerHTML=`
+      <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
+        <div style="font-size:36px;line-height:1">${emoji}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="font-size:16px;font-weight:700;color:var(--text)">${r.espaco}</span>
+            <span class="pill ${st.pill}" style="font-size:11px">${st.label}</span>
+            ${r.pgto?`<span style="font-size:11px;color:var(--text-2)">${pgtoMap[r.pgto]||''}</span>`:''}
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 20px;margin-bottom:10px">
+            <div><span style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px">Morador</span><div style="font-size:13px;color:var(--text);font-weight:600">${r.nome||'—'}</div></div>
+            <div><span style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px">Lote</span><div style="font-size:13px;color:var(--text)">${r.lote||'—'}</div></div>
+            <div><span style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px">Telefone</span><div style="font-size:13px;color:var(--text)">${r.tel||'—'}</div></div>
+            <div><span style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px">Pessoas</span><div style="font-size:13px;color:var(--text)">${r.pessoas||'—'}</div></div>
+            <div><span style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px">Data</span><div style="font-size:13px;color:var(--gold);font-weight:600">${dataFmt}</div></div>
+            <div><span style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px">Horário</span><div style="font-size:13px;color:var(--text)">${r.horario||'—'}</div></div>
+            <div><span style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px">Finalidade</span><div style="font-size:13px;color:var(--text)">${r.finalidade||'—'}</div></div>
+            <div><span style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px">Taxa</span><div style="font-size:13px;color:var(--text)">${taxa}</div></div>
+            <div><span style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px">Caução</span><div style="font-size:13px;color:var(--text)">${caucao}</div></div>
+          </div>
+          <!-- Checklist -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:${r.obs?'10px':'0'}">${chkHtml}</div>
+          ${r.obs?`<div style="font-size:13px;color:var(--text-2);font-style:italic;border-left:2px solid var(--border-h);padding-left:10px;margin-top:4px">${r.obs}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button class="btn btn-ghost btn-sm" onclick="abrirModalRes(${r.id})">✏️ Editar</button>
+          <button class="btn btn-red btn-sm" onclick="excluirRes(${r.id})">🗑️ Excluir</button>
+        </div>
+      </div>
+    `;
+    lista.appendChild(div);
+  });
+}
+
+function limparFiltrosRes(){
+  $('res-busca').value='';
+  $('res-f-espaco').value='';
+  $('res-f-status').value='';
+  $('res-f-ini').value='';
+  $('res-f-fim').value='';
+  renderReservas();
+}
+
+function abrirModalRes(id){
+  const all=G('reservas')||[], r=id?all.find(x=>x.id===id):null;
+  $('mres-t').textContent=r?'Editar Reserva':'Nova Reserva';
+  $('mres-id').value=r?.id||'';
+  $('mres-nome').value=r?.nome||'';
+  $('mres-lote').value=r?.lote||'';
+  $('mres-tel').value=r?.tel||'';
+  $('mres-pessoas').value=r?.pessoas||'';
+  $('mres-espaco').value=r?.espaco||'Quadra de Areia';
+  $('mres-status').value=r?.status||'pendente';
+  $('mres-data').value=r?.data||new Date().toISOString().slice(0,10);
+  // Horário
+  const hrVal=r?.horario||'08:00–12:00';
+  const opts=[...$('mres-horario').options].map(o=>o.value);
+  if(opts.includes(hrVal)){$('mres-horario').value=hrVal;$('mres-hr-custom-wrap').style.display='none';}
+  else{$('mres-horario').value='personalizado';$('mres-hr-custom-wrap').style.display='';$('mres-hr-custom').value=hrVal;}
+  $('mres-finalidade').value=r?.finalidade||'';
+  $('mres-taxa').value=r?.taxa||'';
+  $('mres-caucao').value=r?.caucao||'';
+  $('mres-pgto').value=r?.pgto||'pendente';
+  $('mres-data-pgto').value=r?.dataPgto||'';
+  $('mres-chk-termo').checked=r?.chkTermo||false;
+  $('mres-chk-vistoria-pre').checked=r?.chkVPre||false;
+  $('mres-chk-vistoria-pos').checked=r?.chkVPos||false;
+  $('mres-chk-caucao-dev').checked=r?.chkCaucaoDev||false;
+  $('mres-chk-regras').checked=r?.chkRegras||false;
+  $('mres-chk-devolucao').checked=r?.chkDevolucao||false;
+  $('mres-obs').value=r?.obs||'';
+  $('m-res').classList.add('open');
+}
+
+// Mostrar/ocultar campo horário personalizado - controlado via onchange no select
+
+function salvarRes(){
+  if(!$('mres-nome').value.trim()){toast('⚠️ Informe o nome do morador.');return;}
+  if(!$('mres-data').value){toast('⚠️ Informe a data da reserva.');return;}
+  const all=G('reservas')||[], id=$('mres-id').value;
+  const hrSel=$('mres-horario').value;
+  const hr=hrSel==='personalizado'?$('mres-hr-custom').value.trim():hrSel;
+  const obj={
+    id:id?+id:Date.now(),
+    nome:$('mres-nome').value.trim(),
+    lote:$('mres-lote').value.trim(),
+    tel:$('mres-tel').value.trim(),
+    pessoas:$('mres-pessoas').value,
+    espaco:$('mres-espaco').value,
+    status:$('mres-status').value,
+    data:$('mres-data').value,
+    horario:hr,
+    finalidade:$('mres-finalidade').value.trim(),
+    taxa:parseFloat($('mres-taxa').value)||0,
+    caucao:parseFloat($('mres-caucao').value)||0,
+    pgto:$('mres-pgto').value,
+    dataPgto:$('mres-data-pgto').value,
+    chkTermo:$('mres-chk-termo').checked,
+    chkVPre:$('mres-chk-vistoria-pre').checked,
+    chkVPos:$('mres-chk-vistoria-pos').checked,
+    chkCaucaoDev:$('mres-chk-caucao-dev').checked,
+    chkRegras:$('mres-chk-regras').checked,
+    chkDevolucao:$('mres-chk-devolucao').checked,
+    obs:$('mres-obs').value.trim(),
+  };
+  if(id){const i=all.findIndex(x=>x.id===+id);if(i>=0)all[i]=obj;}else all.push(obj);
+  S('reservas',all); closeModal('m-res'); renderReservas(); toast('✓ Reserva salva com sucesso.');
+}
+
+function excluirRes(id){
+  if(!confirm('Remover esta reserva?')) return;
+  S('reservas',(G('reservas')||[]).filter(r=>r.id!==id));
+  renderReservas(); toast('✓ Reserva removida.');
+}
+</script>
+</body>
+</html>
