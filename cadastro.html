@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solicitar Acesso — Portal APVC</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0F1117;--card:#1A1E28;--card-2:#1F2433;
+    --border:rgba(255,255,255,0.07);--border-h:rgba(200,168,75,0.4);
+    --text:#E8EAF0;--text-2:#9BA3AF;--text-3:#5C6470;
+    --gold:#C8A84B;--gold-l:#D4B86A;--green:#2A9D6F;--red:#E05252;
+    --ink-2:#252A38;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+  
+  .page{width:100%;max-width:520px}
+
+  /* Logo */
+  .logo-wrap{text-align:center;margin-bottom:32px}
+  .logo-circle{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1A2518,#2D3E22);border:2px solid rgba(200,168,75,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:28px}
+  .logo-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
+  .logo-title span{color:var(--gold)}
+  .logo-sub{font-size:13px;color:var(--text-3);margin-top:4px}
+
+  /* Card */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:32px}
+  .card-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .card-sub{font-size:13px;color:var(--text-3);margin-bottom:24px;line-height:1.5}
+
+  /* Form */
+  .fg{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+  .fg.half{flex:1;min-width:0}
+  .row{display:flex;gap:14px}
+  label{font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px}
+  input,select{
+    padding:11px 14px;border-radius:10px;border:1px solid var(--border);
+    background:var(--ink-2);color:var(--text);font-size:14px;outline:none;
+    transition:border-color 0.2s,box-shadow 0.2s;width:100%
+  }
+  input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,168,75,0.12)}
+  input::placeholder{color:var(--text-3)}
+
+  /* Divisor */
+  .divider{display:flex;align-items:center;gap:12px;margin:8px 0 20px;color:var(--text-3);font-size:12px}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  /* Botão */
+  .btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#C8A84B,#D4B86A);color:#1A1E28;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:0.3px;transition:all 0.2s;margin-top:8px}
+  .btn:hover{opacity:0.92;box-shadow:0 6px 24px rgba(200,168,75,0.35)}
+  .btn:disabled{opacity:0.5;cursor:not-allowed}
+
+  /* Aviso */
+  .notice{background:rgba(42,157,111,0.08);border:1px solid rgba(42,157,111,0.2);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:20px}
+  .notice strong{color:var(--green)}
+
+  /* Erro */
+  .err{background:rgba(224,82,82,0.1);border:1px solid rgba(224,82,82,0.3);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--red);margin-bottom:16px;display:none}
+
+  /* Sucesso */
+  #success-screen{display:none;text-align:center;padding:8px 0}
+  .check-circle{width:72px;height:72px;border-radius:50%;background:rgba(42,157,111,0.15);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px}
+  .success-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px}
+  .success-sub{font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:24px}
+  .btn-link{display:inline-block;padding:10px 24px;border-radius:10px;border:1px solid var(--border);color:var(--text-2);text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
+  .btn-link:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* Footer */
+  .footer{text-align:center;margin-top:20px;font-size:12px;color:var(--text-3)}
+  .footer a{color:var(--gold);text-decoration:none}
+
+  @media(max-width:480px){.row{flex-direction:column;gap:0}}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <!-- Logo -->
+  <div class="logo-wrap">
+    <div class="logo-circle">🌿</div>
+    <div class="logo-title">Portal <span>APVC</span></div>
+    <div class="logo-sub">Parque Village Castelo</div>
+  </div>
+
+  <!-- Card de cadastro -->
+  <div class="card">
+    <div id="form-screen">
+      <div class="card-title">Solicitar Acesso ao Portal</div>
+      <div class="card-sub">Preencha seus dados. Após a validação pelo síndico, você receberá a confirmação de acesso.</div>
+
+      <div class="notice">
+        <strong>Como funciona?</strong><br>
+        Após o cadastro, sua solicitação será analisada pela administração. Quando aprovada, você receberá um contato com suas credenciais de acesso.
+      </div>
+
+      <div id="form-err" class="err"></div>
+
+      <div class="row">
+        <div class="fg half">
+          <label>Nome completo *</label>
+          <input type="text" id="f-nome" placeholder="Seu nome completo">
+        </div>
+        <div class="fg half">
+          <label>E-mail *</label>
+          <input type="email" id="f-email" placeholder="seu@email.com">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="fg half">
+          <label>Quadra *</label>
+          <input type="text" id="f-quadra" placeholder="Ex: Q5">
+        </div>
+        <div class="fg half">
+          <label>Lote *</label>
+          <input type="text" id="f-lote" placeholder="Ex: L12">
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Telefone / WhatsApp *</label>
+        <input type="tel" id="f-tel" placeholder="(11) 99999-9999">
+      </div>
+
+      <div class="divider">informações de acesso</div>
+
+      <div class="fg">
+        <label>Senha desejada *</label>
+        <input type="password" id="f-senha" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="fg">
+        <label>Confirmar senha *</label>
+        <input type="password" id="f-senha2" placeholder="Repita a senha">
+      </div>
+
+      <button class="btn" id="btn-enviar" onclick="enviarCadastro()">Enviar Solicitação</button>
+    </div>
+
+    <!-- Tela de sucesso -->
+    <div id="success-screen">
+      <div class="check-circle">✓</div>
+      <div class="success-title">Solicitação enviada!</div>
+      <div class="success-sub">
+        Seus dados foram recebidos com sucesso.<br>
+        A administração analisará seu cadastro em breve.<br><br>
+        <strong style="color:var(--text)">Fique de olho no seu e-mail</strong> — você será notificado quando o acesso for liberado.
+      </div>
+      <a href="index.html" class="btn-link">← Voltar ao Portal</a>
+    </div>
+  </div>
+
+  <div class="footer">
+    Já tem acesso? <a href="index.html">Entrar no portal</a>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDpyQdCZFM6veIlxcoZXpEeDYH9ACxcGK8",
+  authDomain: "apvc-86992.firebaseapp.com",
+  projectId: "apvc-86992",
+  storageBucket: "apvc-86992.firebasestorage.app",
+  messagingSenderId: "849214468014",
+  appId: "1:849214468014:web:a43dda597edf3cc071a23f"
+};
+
+var db = null;
+try {
+  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+} catch(e){ console.error('Firebase:', e); }
+
+function showErr(msg){
+  var el = document.getElementById('form-err');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function hideErr(){
+  document.getElementById('form-err').style.display = 'none';
+}
+
+function val(id){ return document.getElementById(id).value.trim(); }
+
+async function enviarCadastro(){
+  hideErr();
+  var nome   = val('f-nome');
+  var email  = val('f-email');
+  var quadra = val('f-quadra');
+  var lote   = val('f-lote');
+  var tel    = val('f-tel');
+  var senha  = val('f-senha');
+  var senha2 = val('f-senha2');
+
+  if(!nome)         { showErr('Por favor, informe seu nome completo.'); return; }
+  if(!email || !email.includes('@')) { showErr('Informe um e-mail válido.'); return; }
+  if(!quadra||!lote){ showErr('Informe sua quadra e lote.'); return; }
+  if(!tel)          { showErr('Informe seu telefone.'); return; }
+  if(senha.length < 6) { showErr('A senha deve ter pelo menos 6 caracteres.'); return; }
+  if(senha !== senha2) { showErr('As senhas não coincidem.'); return; }
+
+  var btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    if(!db) throw new Error('Banco de dados indisponível. Tente mais tarde.');
+
+    // Verificar se email já cadastrado
+    var existing = await db.collection('apvc_usuarios').where('email','==',email).get();
+    if(!existing.empty){
+      showErr('Este e-mail já possui um cadastro. Aguarde a aprovação ou entre em contato com a administração.');
+      btn.disabled = false; btn.textContent = 'Enviar Solicitação';
+      return;
+    }
+
+    await db.collection('apvc_usuarios').add({
+      nome: nome,
+      email: email,
+      lote: quadra.toUpperCase() + ' ' + lote.toUpperCase(),
+      quadra: quadra.toUpperCase(),
+      tel: tel,
+      senha: senha, // em produção, usar hash
+      status: 'pendente',
+      nivel: 'morador',
+      dataCadastro: new Date().toISOString(),
+      dataAprovacao: null,
+      obs: ''
+    });
+
+    document.getElementById('form-screen').style.display = 'none';
+    document.getElementById('success-screen').style.display = 'block';
+
+  } catch(e){
+    showErr('Erro ao enviar: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = 'Enviar Solicitação';
+  }
+}
+
+// Enter para enviar
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Enter') enviarCadastro();
+});
+</script>
+</body>
+</html>
