@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APVC · Informativo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root {
+  --ink:    #0A0B0D;
+  --ink-2:  #111318;
+  --ink-3:  #181C24;
+  --panel:  #1A1E28;
+  --card:   #20252F;
+  --border: rgba(255,255,255,0.09);
+  --gold:   #C8A84B;
+  --gold-d: #8B6F2E;
+  --text:   #F0EDE8;
+  --text-2: #9BA3AF;
+  --text-3: #5C6470;
+  --green:  #2A9D6F;
+  --green-l:#3DC68D;
+  --radius: 12px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--ink);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOPBAR ── */
+#topbar {
+  height: 64px;
+  background: var(--ink-2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+  gap: 16px;
+  z-index: 10;
+}
+
+.tb-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tb-crest {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-d) 100%);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: var(--ink);
+  flex-shrink: 0;
+}
+
+.tb-info h1 {
+  font-size: 16px; font-weight: 600; color: var(--text);
+  line-height: 1.2;
+}
+.tb-info p {
+  font-size: 11px; color: var(--text-3); margin-top: 1px;
+}
+
+.tb-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Controles de zoom */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 4px 8px;
+}
+
+.zoom-btn {
+  width: 34px; height: 34px;
+  border: none; background: transparent;
+  color: var(--text-2); font-size: 18px; font-weight: 700;
+  cursor: pointer; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.zoom-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+
+#zoom-label {
+  font-size: 13px; color: var(--text-2);
+  min-width: 44px; text-align: center; font-weight: 500;
+}
+
+/* Paginação */
+.page-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 4px 10px;
+}
+.page-btn {
+  width: 32px; height: 32px;
+  border: none; background: transparent;
+  color: var(--text-2); font-size: 16px;
+  cursor: pointer; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.page-btn:hover:not(:disabled) { background: rgba(255,255,255,0.08); color: var(--text); }
+.page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+#page-label { font-size: 13px; color: var(--text-2); white-space: nowrap; }
+
+/* Botão download */
+#btn-download {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 20px; height: 42px;
+  background: linear-gradient(135deg, var(--gold) 0%, #A8882C 100%);
+  border: none; border-radius: 9px;
+  font-size: 14px; font-weight: 600;
+  color: var(--ink); cursor: pointer;
+  box-shadow: 0 2px 14px rgba(200,168,75,0.3);
+  transition: opacity 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+#btn-download:hover { opacity: 0.9; box-shadow: 0 4px 22px rgba(200,168,75,0.45); }
+#btn-download svg { flex-shrink: 0; }
+
+/* Voltar */
+#btn-back {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 14px; height: 38px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-2); cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+#btn-back:hover { border-color: rgba(255,255,255,0.2); color: var(--text); background: rgba(255,255,255,0.04); }
+
+/* ── CORPO PRINCIPAL ── */
+#viewer-wrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 40px;
+  background: var(--ink);
+}
+
+/* Canvas das páginas */
+.pdf-page-wrap {
+  margin-bottom: 16px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  line-height: 0;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* ── LOADING / ERRO ── */
+#state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 24px;
+  color: var(--text-3);
+  font-size: 15px;
+  text-align: center;
+}
+
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid rgba(255,255,255,0.08);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.35); }
+
+/* ── RESPONSIVO ── */
+@media (max-width: 640px) {
+  #topbar { flex-wrap: wrap; height: auto; padding: 12px 14px; gap: 10px; }
+  .zoom-controls, .page-controls { display: none; }
+  #btn-download { font-size: 13px; padding: 0 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div id="topbar">
+  <div class="tb-left">
+    <div class="tb-crest">A</div>
+    <div class="tb-info">
+      <h1 id="tb-titulo">Informativo APVC</h1>
+      <p id="tb-sub">Carregando…</p>
+    </div>
+  </div>
+
+  <div class="tb-right">
+
+    <!-- Paginação -->
+    <div class="page-controls" id="page-controls" style="display:none">
+      <button class="page-btn" id="btn-prev" title="Página anterior" onclick="mudarPagina(-1)">‹</button>
+      <span id="page-label">1 / 1</span>
+      <button class="page-btn" id="btn-next" title="Próxima página" onclick="mudarPagina(1)">›</button>
+    </div>
+
+    <!-- Zoom -->
+    <div class="zoom-controls" id="zoom-controls" style="display:none">
+      <button class="zoom-btn" title="Diminuir zoom" onclick="alterarZoom(-0.15)">−</button>
+      <span id="zoom-label">100%</span>
+      <button class="zoom-btn" title="Aumentar zoom" onclick="alterarZoom(0.15)">+</button>
+    </div>
+
+    <!-- Voltar -->
+    <a id="btn-back" href="javascript:history.back()">← Voltar</a>
+
+    <!-- Download -->
+    <a id="btn-download" href="#" download>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v13M7 11l5 5 5-5"/><path d="M5 20h14"/>
+      </svg>
+      Baixar PDF
+    </a>
+
+  </div>
+</div>
+
+<!-- ══ ÁREA DO PDF ══ -->
+<div id="viewer-wrap">
+  <div id="state-box">
+    <div class="spinner"></div>
+    <span>Carregando informativo…</span>
+  </div>
+  <div id="pdf-container"></div>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ── Parâmetros da URL ──
+const params  = new URLSearchParams(location.search);
+const arquivo = params.get('pdf') || 'informativo.pdf';
+const edicao  = params.get('ed')  || '';
+
+// ── Botão de download ──
+const btnDl = document.getElementById('btn-download');
+btnDl.href = arquivo;
+btnDl.setAttribute('download', arquivo);
+
+// ── Título dinâmico ──
+if (edicao) {
+  document.getElementById('tb-titulo').textContent = 'Informativo APVC · Edição ' + edicao;
+}
+
+// ── Estado ──
+let pdfDoc   = null;
+let pagAtual = 1;
+let totalPag = 1;
+let escala   = calcEscalaInicial();
+let renderizando = false;
+
+function calcEscalaInicial() {
+  // Ocupa ~95% da largura disponível (descontando padding e bordas)
+  const largDisp = Math.min(window.innerWidth - 48, 1400);
+  // PDF A4 ≈ 595pt de largura. Escala base = largura disponível / 595
+  return Math.max(1.2, largDisp / 595);
+}
+
+// ── Renderizar página ──
+async function renderizarPagina(num) {
+  if (renderizando) return;
+  renderizando = true;
+
+  const container = document.getElementById('pdf-container');
+  container.innerHTML = '';
+
+  const page    = await pdfDoc.getPage(num);
+  const viewport = page.getViewport({ scale: escala });
+
+  const wrap  = document.createElement('div');
+  wrap.className = 'pdf-page-wrap';
+
+  const canvas  = document.createElement('canvas');
+  const ctx     = canvas.getContext('2d');
+  canvas.width  = viewport.width;
+  canvas.height = viewport.height;
+
+  wrap.appendChild(canvas);
+  container.appendChild(wrap);
+
+  await page.render({ canvasContext: ctx, viewport }).promise;
+
+  // Atualiza paginação
+  document.getElementById('page-label').textContent = num + ' / ' + totalPag;
+  document.getElementById('btn-prev').disabled = num <= 1;
+  document.getElementById('btn-next').disabled = num >= totalPag;
+  document.getElementById('zoom-label').textContent = Math.round(escala * 100 / calcEscalaInicial() * 100) + '%';
+
+  renderizando = false;
+}
+
+// ── Carregar PDF ──
+async function carregarPdf() {
+  const stateBox = document.getElementById('state-box');
+  try {
+    const loadTask = pdfjsLib.getDocument(arquivo);
+    pdfDoc   = await loadTask.promise;
+    totalPag = pdfDoc.numPages;
+
+    // Atualiza UI
+    stateBox.style.display = 'none';
+    document.getElementById('page-controls').style.display = totalPag > 1 ? 'flex' : 'none';
+    document.getElementById('zoom-controls').style.display = 'flex';
+
+    const sub = document.getElementById('tb-sub');
+    sub.textContent = totalPag + (totalPag === 1 ? ' página' : ' páginas') + ' · ' + arquivo;
+
+    document.title = 'APVC · ' + (edicao ? 'Informativo Ed. ' + edicao : 'Informativo');
+
+    await renderizarPagina(1);
+
+  } catch (err) {
+    stateBox.innerHTML = `
+      <div style="font-size:40px;margin-bottom:8px">📄</div>
+      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px">Arquivo não encontrado</div>
+      <div style="font-size:13px;color:var(--text-3);max-width:360px">
+        O PDF <strong style="color:var(--text-2)">${arquivo}</strong> não foi encontrado.<br>
+        Verifique se o arquivo foi publicado corretamente no servidor.
+      </div>
+      <a href="javascript:history.back()"
+         style="margin-top:20px;padding:10px 22px;border-radius:9px;background:rgba(200,168,75,0.12);
+                color:var(--gold);border:1px solid rgba(200,168,75,0.3);text-decoration:none;
+                font-size:13px;font-weight:600">
+        ← Voltar
+      </a>`;
+  }
+}
+
+// ── Controles ──
+function mudarPagina(delta) {
+  const nova = pagAtual + delta;
+  if (nova < 1 || nova > totalPag || renderizando) return;
+  pagAtual = nova;
+  document.getElementById('viewer-wrap').scrollTop = 0;
+  renderizarPagina(pagAtual);
+}
+
+function alterarZoom(delta) {
+  const escalaBase = calcEscalaInicial();
+  const novaEscala = Math.max(escalaBase * 0.5, Math.min(escala + escalaBase * delta * 2, escalaBase * 4));
+  escala = novaEscala;
+  renderizarPagina(pagAtual);
+}
+
+// Atalhos de teclado
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') mudarPagina(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   mudarPagina(-1);
+  if (e.key === '+' || e.key === '=') alterarZoom(0.15);
+  if (e.key === '-') alterarZoom(-0.15);
+});
+
+// Reajusta ao redimensionar
+window.addEventListener('resize', () => {
+  escala = calcEscalaInicial();
+  if (pdfDoc) renderizarPagina(pagAtual);
+});
+
+carregarPdf();
+</script>
+</body>
+</html>
