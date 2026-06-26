@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AdminPro · Portal de Gestão</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&family=Poppins:wght@800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <!-- Segoe UI — fonte nativa do Windows -->
 <!-- Aplica tema antes do render para evitar flash -->
@@ -1396,24 +1396,25 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
     <!-- Logo -->
     <div class="ap-logo">
       <!-- SVG recreation do logo AdminPro -->
-      <svg class="ap-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 530 112" fill="none">
-        <!-- Arco navy (130° → 315°, grande) -->
-        <path d="M 21.6 94.8 A 52 52 0 1 1 91.8 18.2" stroke="#1B2B5E" stroke-width="8" stroke-linecap="round"/>
-        <!-- Arco laranja (315° → 130°, pequeno) -->
-        <path d="M 91.8 18.2 A 52 52 0 0 1 21.6 94.8" stroke="#E87722" stroke-width="8" stroke-linecap="round"/>
-        <!-- "P" azul (atrás) -->
-        <text x="44" y="77" font-family="'Arial Black',Impact,'Franklin Gothic Heavy',sans-serif" font-size="56" font-weight="900" fill="#2E7DD1">P</text>
-        <!-- "A" navy (na frente) -->
-        <text x="9" y="77" font-family="'Arial Black',Impact,'Franklin Gothic Heavy',sans-serif" font-size="56" font-weight="900" fill="#1B2B5E">A</text>
-        <!-- Barras (gráfico) -->
-        <rect x="11" y="83" width="8" height="13" rx="2" fill="#2E7DD1"/>
-        <rect x="23" y="76" width="8" height="20" rx="2" fill="#2E7DD1"/>
-        <rect x="35" y="69" width="8" height="27" rx="2" fill="#2E7DD1"/>
-        <rect x="47" y="79" width="8" height="17" rx="2" fill="#2E7DD1"/>
-        <!-- "Admin" texto navy -->
-        <text x="126" y="78" font-family="'Arial Black',Impact,'Franklin Gothic Heavy',sans-serif" font-size="58" font-weight="900" fill="#1B2B5E">Admin</text>
-        <!-- "Pro" texto laranja -->
-        <text x="298" y="78" font-family="'Arial Black',Impact,'Franklin Gothic Heavy',sans-serif" font-size="58" font-weight="900" fill="#E87722">Pro</text>
+      <svg class="ap-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 108" fill="none">
+        <!-- Ícone circular — center(54,54) r=50 -->
+        <!-- Arco navy: 30° → 240° clockwise (210°, large-arc=1) -->
+        <path d="M 97.3 79 A 50 50 0 1 1 29 8" stroke="#1B2B5E" stroke-width="7.5" stroke-linecap="round"/>
+        <!-- Arco laranja: 240° → 30° clockwise (150°, large-arc=0) -->
+        <path d="M 29 8 A 50 50 0 0 1 97.3 79" stroke="#E87722" stroke-width="7.5" stroke-linecap="round"/>
+        <!-- "P" azul médio (atrás) -->
+        <text x="42" y="74" font-family="Poppins,'Arial Black',sans-serif" font-size="55" font-weight="900" fill="#2E7DD1">P</text>
+        <!-- "A" navy escuro (na frente) -->
+        <text x="7"  y="74" font-family="Poppins,'Arial Black',sans-serif" font-size="55" font-weight="900" fill="#1B2B5E">A</text>
+        <!-- Barras (4 barras em altura crescente) -->
+        <rect x="11" y="79" width="8" height="16" rx="2" fill="#2E7DD1"/>
+        <rect x="23" y="72" width="8" height="23" rx="2" fill="#2E7DD1"/>
+        <rect x="35" y="65" width="8" height="30" rx="2" fill="#2E7DD1"/>
+        <rect x="47" y="75" width="8" height="20" rx="2" fill="#2E7DD1"/>
+        <!-- "Admin" em Poppins navy -->
+        <text x="124" y="76" font-family="Poppins,'Arial Black',sans-serif" font-size="60" font-weight="800" fill="#1B2B5E" letter-spacing="-0.5">Admin</text>
+        <!-- "Pro" em Poppins laranja -->
+        <text x="308" y="76" font-family="Poppins,'Arial Black',sans-serif" font-size="60" font-weight="800" fill="#E87722" letter-spacing="-0.5">Pro</text>
       </svg>
       <div class="ap-tagline">Gestão Inteligente</div>
     </div>
