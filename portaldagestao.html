@@ -408,8 +408,9 @@ body{
 }
 .sb-nav{flex:1;padding:10px 10px 14px;overflow-y:auto}
 
-/* ── Accordion grupo ── */
+/* ── Cabeçalho de grupo (abre coluna ao lado) ── */
 .sb-group{margin-bottom:2px}
+.nav-standalone{margin-bottom:2px}
 .sb-group-hd{
   display:flex;align-items:center;gap:10px;
   padding:10px 12px;border-radius:10px;
@@ -420,27 +421,56 @@ body{
   user-select:none;
 }
 .sb-group-hd:hover{background:rgba(255,255,255,0.06);color:#EEF1F8}
-.sb-group-hd.open{color:#EEF1F8}
+.sb-group-hd.active{background:rgba(232,119,34,0.14);color:#E87722;font-weight:600}
+.sb-group-hd.active::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:20px;background:#E87722;border-radius:2px;
+}
+.sb-group-hd.active .nav-icon{background:rgba(232,119,34,0.18)}
+.sb-group-hd.open{color:#EEF1F8;background:rgba(255,255,255,0.05)}
 .sb-group-arrow{
-  margin-left:auto;font-size:10px;
+  margin-left:auto;font-size:16px;line-height:1;
   color:rgba(174,190,220,0.4);
-  transition:transform 0.22s ease;
+  transition:transform 0.2s ease, color 0.2s;
   flex-shrink:0;
 }
-.sb-group-hd.open .sb-group-arrow{transform:rotate(90deg);color:rgba(232,119,34,0.8)}
-.sb-group-body{
-  overflow:hidden;
-  max-height:0;
-  transition:max-height 0.28s ease;
-}
-.sb-group-body.open{max-height:600px}
-.sb-group-body .nav-item{
-  padding-left:22px;
-  font-size:13px;
-}
+.sb-group-hd.open .sb-group-arrow,
+.sb-group-hd.active .sb-group-arrow{color:rgba(232,119,34,0.9);transform:translateX(3px)}
 
-/* item standalone (Dashboard) */
-.nav-standalone{margin-bottom:2px}
+/* ── Coluna flyout (lista do tópico, à direita) ── */
+.sb-flyout{
+  position:fixed;top:0;left:var(--sidebar);
+  width:236px;height:100vh;
+  background:#16223C;
+  border-right:1px solid rgba(255,255,255,0.07);
+  box-shadow:22px 0 60px rgba(0,0,0,0.40);
+  z-index:195;
+  display:flex;flex-direction:column;
+  transform:translateX(-18px);opacity:0;visibility:hidden;pointer-events:none;
+  transition:transform 0.22s cubic-bezier(0.16,1,0.3,1),opacity 0.2s,visibility 0.22s;
+}
+.sb-flyout.open{transform:translateX(0);opacity:1;visibility:visible;pointer-events:auto}
+.sb-flyout-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:21px 18px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;
+}
+.sb-flyout-title{
+  font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:#E87722;
+}
+.sb-flyout-close{
+  background:none;border:none;cursor:pointer;
+  color:rgba(174,190,220,0.55);font-size:18px;line-height:1;
+  padding:0 6px;border-radius:6px;transition:all 0.15s;
+}
+.sb-flyout-close:hover{background:rgba(255,255,255,0.08);color:#EEF1F8}
+.sb-flyout-body{padding:12px;overflow-y:auto;flex:1}
+.sb-flyout-body .nav-item{font-size:13px}
+.sb-flyout-ov{position:fixed;inset:0;z-index:120;display:none}
+.sb-flyout-ov.open{display:block}
+html.light .sb-flyout{background:#1A2847}
 
 /* ── Nav item ── */
 .nav-item{
@@ -1155,6 +1185,10 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
   }
   .sb-overlay.open{ display:block }
 
+  /* ── Flyout vira segunda página do drawer ── */
+  .sb-flyout{ left:0; width:260px; z-index:600; box-shadow:4px 0 40px rgba(0,0,0,0.5) }
+  .sb-flyout-ov{ z-index:599 }
+
   /* ── Main sem margem lateral ── */
   .main{ margin-left:0 }
 
@@ -1474,97 +1508,37 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
 
       <!-- Dashboard standalone -->
       <div class="nav-standalone" data-acesso="admin,gestor">
-        <div class="nav-item" onclick="showPanel('dashboard',this)">
+        <div class="nav-item" id="nav-dashboard" onclick="showPanel('dashboard',this)">
           <div class="nav-icon"><i class="fa-solid fa-gauge-high"></i></div>Dashboard
         </div>
       </div>
 
-      <!-- GRUPO: Painéis -->
+      <!-- Grupos: ao clicar abrem a coluna (flyout) ao lado -->
       <div class="sb-group" data-acesso="admin,gestor">
-        <div class="sb-group-hd" onclick="sbToggle(this)">
-          <div class="nav-icon"><i class="fa-solid fa-chart-bar"></i></div>
-          Painéis
-          <span class="sb-group-arrow">&#9654;</span>
-        </div>
-        <div class="sb-group-body">
-          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('lotes',this)">
-            <div class="nav-icon"><i class="fa-solid fa-map-location-dot"></i></div>Censo de Lotes
-          </div>
-          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('funcionarios',this)">
-            <div class="nav-icon"><i class="fa-solid fa-users"></i></div>Funcionários
-          </div>
-          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('financeiro',this)">
-            <div class="nav-icon"><i class="fa-solid fa-wallet"></i></div>Financeiro
-          </div>
-          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('inadimplencia',this)">
-            <div class="nav-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>Inadimplência
-          </div>
+        <div class="sb-group-hd" data-grupo="paineis" onclick="sbAbrirGrupo('paineis',this)">
+          <div class="nav-icon"><i class="fa-solid fa-chart-bar"></i></div>Painéis
+          <span class="sb-group-arrow">&#8250;</span>
         </div>
       </div>
 
-      <!-- GRUPO: Cadastro -->
       <div class="sb-group" data-acesso="admin,gestor">
-        <div class="sb-group-hd" onclick="sbToggle(this)">
-          <div class="nav-icon"><i class="fa-solid fa-folder-plus"></i></div>
-          Cadastro
-          <span class="sb-group-arrow">&#9654;</span>
-        </div>
-        <div class="sb-group-body">
-          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('unidades',this)">
-            <div class="nav-icon"><i class="fa-solid fa-house-chimney"></i></div>Cadastro de Unidades
-          </div>
+        <div class="sb-group-hd" data-grupo="cadastro" onclick="sbAbrirGrupo('cadastro',this)">
+          <div class="nav-icon"><i class="fa-solid fa-folder-plus"></i></div>Cadastro
+          <span class="sb-group-arrow">&#8250;</span>
         </div>
       </div>
 
-      <!-- GRUPO: Operações -->
       <div class="sb-group" data-acesso="admin,gestor,morador">
-        <div class="sb-group-hd" onclick="sbToggle(this)">
-          <div class="nav-icon"><i class="fa-solid fa-layer-group"></i></div>
-          Operações
-          <span class="sb-group-arrow">&#9654;</span>
-        </div>
-        <div class="sb-group-body">
-          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('manutencao',this)">
-            <div class="nav-icon"><i class="fa-solid fa-wrench"></i></div>Manutenção
-          </div>
-          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('preventivas',this)">
-            <div class="nav-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>Preventivas & Corretivas
-          </div>
-          <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('comunicados',this)">
-            <div class="nav-icon"><i class="fa-solid fa-bullhorn"></i></div>Comunicados
-          </div>
-          <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('eventos',this)">
-            <div class="nav-icon"><i class="fa-solid fa-calendar-day"></i></div>Eventos
-          </div>
-          <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('reservas',this)">
-            <div class="nav-icon"><i class="fa-solid fa-calendar-check"></i></div>Reservas
-          </div>
-          <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('regulamento',this)">
-            <div class="nav-icon"><i class="fa-solid fa-scroll"></i></div>Regulamentos
-          </div>
-          <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('procedimentos',this)">
-            <div class="nav-icon"><i class="fa-solid fa-clipboard-list"></i></div>Procedimentos
-          </div>
+        <div class="sb-group-hd" data-grupo="operacoes" onclick="sbAbrirGrupo('operacoes',this)">
+          <div class="nav-icon"><i class="fa-solid fa-layer-group"></i></div>Operações
+          <span class="sb-group-arrow">&#8250;</span>
         </div>
       </div>
 
-      <!-- GRUPO: Sistema (admin only) -->
       <div class="sb-group" data-acesso="admin">
-        <div class="sb-group-hd" onclick="sbToggle(this)">
-          <div class="nav-icon"><i class="fa-solid fa-sliders"></i></div>
-          Sistema
-          <span class="sb-group-arrow">&#9654;</span>
-        </div>
-        <div class="sb-group-body">
-          <div class="nav-item" data-acesso="admin" onclick="showPanel('usuarios',this)">
-            <div class="nav-icon"><i class="fa-solid fa-users-gear"></i></div>Usuários
-          </div>
-          <div class="nav-item" data-acesso="admin" onclick="showPanel('configuracoes',this)">
-            <div class="nav-icon"><i class="fa-solid fa-gear"></i></div>Configurações
-          </div>
-          <div class="nav-item" data-acesso="admin" onclick="showPanel('admfotos',this)">
-            <div class="nav-icon"><i class="fa-solid fa-images"></i></div>Adm. Fotos
-          </div>
+        <div class="sb-group-hd" data-grupo="sistema" onclick="sbAbrirGrupo('sistema',this)">
+          <div class="nav-icon"><i class="fa-solid fa-sliders"></i></div>Sistema
+          <span class="sb-group-arrow">&#8250;</span>
         </div>
       </div>
 
@@ -1580,6 +1554,16 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
       <button class="logout-btn" onclick="doLogout()">← Sair do Portal</button>
     </div>
   </nav>
+
+  <!-- FLYOUT (coluna do tópico, ao lado da sidebar) -->
+  <div class="sb-flyout-ov" id="sb-flyout-ov" onclick="sbFecharFlyout()"></div>
+  <aside class="sb-flyout" id="sb-flyout">
+    <div class="sb-flyout-hd">
+      <span class="sb-flyout-title" id="sb-flyout-title"></span>
+      <button class="sb-flyout-close" onclick="sbFecharFlyout()" title="Fechar">&times;</button>
+    </div>
+    <div class="sb-flyout-body" id="sb-flyout-body"></div>
+  </aside>
 
   <!-- SIDEBAR OVERLAY (mobile) -->
   <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
@@ -3727,20 +3711,73 @@ function limparFormUnidade(){
   if($('uni-form-title')) $('uni-form-title').textContent='Nova Unidade';
 }
 
-/* \u2500\u2500 Accordion sidebar \u2500\u2500 */
-function sbToggle(hd){
-  const body = hd.nextElementSibling;
-  const isOpen = body.classList.contains('open');
-  body.classList.toggle('open', !isOpen);
-  hd.classList.toggle('open', !isOpen);
+/* \u2500\u2500 Menu lateral: flyout (coluna ao lado) \u2500\u2500 */
+const SB_GRUPOS = {
+  paineis:  { titulo:'Pain\u00e9is', itens:[
+    {id:'lotes',         label:'Censo de Lotes',           icon:'fa-map-location-dot',     acesso:['admin','gestor']},
+    {id:'funcionarios',  label:'Funcion\u00e1rios',             icon:'fa-users',                acesso:['admin','gestor']},
+    {id:'financeiro',    label:'Financeiro',               icon:'fa-wallet',               acesso:['admin','gestor']},
+    {id:'inadimplencia', label:'Inadimpl\u00eancia',            icon:'fa-file-invoice-dollar',  acesso:['admin','gestor']},
+  ]},
+  cadastro: { titulo:'Cadastro', itens:[
+    {id:'unidades',      label:'Cadastro de Unidades',     icon:'fa-house-chimney',        acesso:['admin','gestor']},
+  ]},
+  operacoes:{ titulo:'Opera\u00e7\u00f5es', itens:[
+    {id:'manutencao',    label:'Manuten\u00e7\u00e3o',               icon:'fa-wrench',               acesso:['admin','gestor']},
+    {id:'preventivas',   label:'Preventivas & Corretivas', icon:'fa-screwdriver-wrench',   acesso:['admin','gestor']},
+    {id:'comunicados',   label:'Comunicados',              icon:'fa-bullhorn',             acesso:['admin','gestor','morador']},
+    {id:'eventos',       label:'Eventos',                  icon:'fa-calendar-day',         acesso:['admin','gestor','morador']},
+    {id:'reservas',      label:'Reservas',                 icon:'fa-calendar-check',       acesso:['admin','gestor','morador']},
+    {id:'regulamento',   label:'Regulamentos',             icon:'fa-scroll',               acesso:['admin','gestor','morador']},
+    {id:'procedimentos', label:'Procedimentos',            icon:'fa-clipboard-list',       acesso:['admin','gestor','morador']},
+  ]},
+  sistema:  { titulo:'Sistema', itens:[
+    {id:'usuarios',      label:'Usu\u00e1rios',                 icon:'fa-users-gear',           acesso:['admin']},
+    {id:'configuracoes', label:'Configura\u00e7\u00f5es',            icon:'fa-gear',                 acesso:['admin']},
+    {id:'admfotos',      label:'Adm. Fotos',               icon:'fa-images',               acesso:['admin']},
+  ]},
+};
+let _sbGrupoAberto = null;
+let currentPanel = null;
+
+function sbAbrirGrupo(key, hdEl){
+  const grupo = SB_GRUPOS[key];
+  if(!grupo) return;
+  if(_sbGrupoAberto === key){ sbFecharFlyout(); return; }   // toggle
+  const nivel = window._userNivel || 'morador';
+  const itens = grupo.itens.filter(it => it.acesso.includes(nivel));
+  $('sb-flyout-title').textContent = grupo.titulo;
+  $('sb-flyout-body').innerHTML = itens.map(it =>
+    `<div class="nav-item${currentPanel===it.id?' active':''}" onclick="sbNavItem('${it.id}')">`+
+      `<div class="nav-icon"><i class="fa-solid ${it.icon}"></i></div>${it.label}`+
+    `</div>`).join('');
+  _sbGrupoAberto = key;
+  $('sb-flyout').classList.add('open');
+  $('sb-flyout-ov').classList.add('open');
+  document.querySelectorAll('.sb-group-hd').forEach(h=>h.classList.remove('open'));
+  if(hdEl) hdEl.classList.add('open');
 }
 
-function sbOpenParent(navItem){
-  const body = navItem.closest('.sb-group-body');
-  if(!body) return;
-  body.classList.add('open');
-  const hd = body.previousElementSibling;
-  if(hd) hd.classList.add('open');
+function sbNavItem(id){ showPanel(id); }
+
+function sbFecharFlyout(){
+  _sbGrupoAberto = null;
+  const fly=$('sb-flyout'), ov=$('sb-flyout-ov');
+  if(fly) fly.classList.remove('open');
+  if(ov)  ov.classList.remove('open');
+  document.querySelectorAll('.sb-group-hd').forEach(h=>h.classList.remove('open'));
+}
+
+function sbMarkActive(id){
+  document.querySelectorAll('.sidebar .nav-item, .sb-group-hd').forEach(n=>n.classList.remove('active'));
+  if(id==='dashboard'){ const d=$('nav-dashboard'); if(d) d.classList.add('active'); return; }
+  for(const key in SB_GRUPOS){
+    if(SB_GRUPOS[key].itens.some(it=>it.id===id)){
+      const hd=document.querySelector('.sb-group-hd[data-grupo="'+key+'"]');
+      if(hd) hd.classList.add('active');
+      return;
+    }
+  }
 }
 
 function showPanel(id,el){
@@ -3749,11 +3786,12 @@ function showPanel(id,el){
   if(!permitidos.includes(id)){ toast('\u26a0\ufe0f Acesso restrito ao seu perfil.'); return; }
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   $('panel-'+id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  if(el){ el.classList.add('active'); sbOpenParent(el); }
+  currentPanel = id;
+  sbMarkActive(id);
   $('tb-crumb').textContent=panelNames[id];
-  ({dashboard:renderDashboard,lotes:renderLotes,unidades:renderUnidades,funcionarios:renderFTabela,financeiro:renderFin,manutencao:renderManut,comunicados:renderComun,eventos:renderEventos,preventivas:renderPreventivas,reservas:()=>{renderReservas();verificarAlertas();},regulamento:renderReg,inadimplencia:renderInadimplencia,usuarios:renderUsuarios,configuracoes:()=>{renderCfgReservas()}})[id]?.();
+  sbFecharFlyout();
   closeSidebar();
+  ({dashboard:renderDashboard,lotes:renderLotes,unidades:renderUnidades,funcionarios:renderFTabela,financeiro:renderFin,manutencao:renderManut,comunicados:renderComun,eventos:renderEventos,preventivas:renderPreventivas,reservas:()=>{renderReservas();verificarAlertas();},regulamento:renderReg,inadimplencia:renderInadimplencia,usuarios:renderUsuarios,configuracoes:()=>{renderCfgReservas()}})[id]?.();
 }
 
 function setTab(t){
@@ -3806,13 +3844,9 @@ function initApp(){
   initLotes(); initFuncs(); initFin(); initManut(); initComun(); initPrev(); initRes(); initReg(); initInadimplencia();
   const nivel = window._userNivel || 'morador';
   if(nivel === 'morador'){
-    // Morador abre direto em Comunicados
-    const navComun = document.querySelector('.nav-item[onclick*="comunicados"]');
-    showPanel('comunicados', navComun);
+    showPanel('comunicados');   // morador abre direto em Comunicados
   } else {
-    renderDashboard();
-    const navDash = document.querySelector('.nav-item[onclick*="dashboard"]');
-    if(navDash){ document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); navDash.classList.add('active'); }
+    showPanel('dashboard');
   }
   // Alertas de reservas — checar ao iniciar e a cada 15 minutos
   setTimeout(verificarAlertas, 1500);
