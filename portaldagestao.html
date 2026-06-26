@@ -1647,21 +1647,31 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
       <!-- ████ CADASTRO: UNIDADES ████ -->
       <div class="panel" id="panel-unidades">
         <div class="ph">
-          <div><div class="ph-title">Cadastro de Unidades</div><div class="ph-sub">Endereço, responsável e situação de cada unidade</div></div>
+          <div>
+            <div class="ph-title">Cadastro de Unidades</div>
+            <div class="ph-sub">Cadastre e gerencie o endereço e situação de cada unidade</div>
+          </div>
           <div class="ph-actions">
-            <span id="uni-count" style="font-size:12px;color:var(--text-3)"></span>
+            <span id="uni-count" style="font-size:12px;color:var(--text-3);margin-right:8px"></span>
+            <button class="btn btn-gold" id="uni-btn-novo" onclick="uniNovaUnidade()">+ Nova Unidade</button>
           </div>
         </div>
 
-        <!-- Formulário -->
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-head">
-            <div class="card-title"><div class="card-icon">🏠</div><span id="uni-form-title">Nova Unidade</span></div>
+        <!-- Formulário nova/editar unidade — oculto por padrão -->
+        <div class="card" id="uni-form-card" style="margin-bottom:16px;display:none">
+          <div class="card-head" style="border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:16px">
+            <div class="card-title">
+              <div class="card-icon" style="background:rgba(232,119,34,0.14);color:var(--gold)"><i class="fa-solid fa-house-chimney"></i></div>
+              <span id="uni-form-title">Nova Unidade</span>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="uniFecharForm()" style="margin-left:auto">✕ Cancelar</button>
           </div>
-          <div class="form-grid">
+
+          <!-- Linha 1: Código + Situação -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
             <div class="fg">
-              <label>Unidade <small style="color:var(--text-3);font-weight:400">(ex: A01, M05 — nova ou existente)</small></label>
-              <input type="text" id="uni-cod" list="uni-cod-dl" placeholder="Selecione ou digite a unidade" autocomplete="off" style="text-transform:uppercase">
+              <label>Código da Unidade <small style="color:var(--text-3);font-weight:400">(ex: A01, M05)</small></label>
+              <input type="text" id="uni-cod" list="uni-cod-dl" placeholder="Selecione ou digite" autocomplete="off" style="text-transform:uppercase">
               <datalist id="uni-cod-dl"></datalist>
             </div>
             <div class="fg">
@@ -1672,41 +1682,68 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
                 <option value="Terreno">Terreno</option>
               </select>
             </div>
-            <div class="fg"><label>Nome (responsável / morador)</label><input type="text" id="uni-nome" placeholder="Ex: João da Silva"></div>
-            <div class="fg"><label>Rua</label><input type="text" id="uni-rua" placeholder="Ex: Rua das Palmeiras"></div>
+          </div>
+
+          <!-- Divisor endereço -->
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin-bottom:12px;display:flex;align-items:center;gap:10px">
+            <i class="fa-solid fa-location-dot" style="color:var(--gold);opacity:0.7"></i> Endereço
+          </div>
+
+          <!-- Linha 2: Rua + Número -->
+          <div style="display:grid;grid-template-columns:1fr 140px;gap:16px;margin-bottom:16px">
+            <div class="fg"><label>Rua / Logradouro</label><input type="text" id="uni-rua" placeholder="Ex: Rua das Palmeiras"></div>
             <div class="fg"><label>Número</label><input type="text" id="uni-numero" placeholder="Ex: 123"></div>
+          </div>
+
+          <!-- Linha 3: Bairro + Cidade + UF -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 100px;gap:16px;margin-bottom:20px">
             <div class="fg"><label>Bairro</label><input type="text" id="uni-bairro" placeholder="Ex: Centro"></div>
             <div class="fg"><label>Cidade</label><input type="text" id="uni-cidade" placeholder="Ex: Florianópolis"></div>
-            <div class="fg">
-              <label>Estado</label>
-              <select id="uni-estado"></select>
-            </div>
+            <div class="fg"><label>UF</label><select id="uni-estado"></select></div>
           </div>
-          <div class="modal-actions" style="margin-top:4px">
-            <button class="btn btn-ghost" onclick="limparFormUnidade()">Limpar</button>
-            <button class="btn btn-gold" onclick="salvarUnidade()">💾 Salvar Unidade</button>
+
+          <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="uniFecharForm()">Cancelar</button>
+            <button class="btn btn-gold" onclick="salvarUnidade()"><i class="fa-solid fa-floppy-disk"></i> Salvar Unidade</button>
           </div>
         </div>
 
-        <!-- Lista de unidades -->
+        <!-- Lista de unidades cadastradas -->
         <div class="card">
           <div class="card-head" style="flex-wrap:wrap;gap:10px">
-            <div class="card-title"><div class="card-icon">📋</div>Unidades Cadastradas</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <input type="text" id="uni-busca" placeholder="🔍 Buscar unidade, nome, cidade..." oninput="renderUnidades()"
-                style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;width:240px;outline:none;">
+            <div class="card-title">
+              <div class="card-icon" style="background:rgba(46,125,209,0.12);color:var(--blue)"><i class="fa-solid fa-list"></i></div>
+              Unidades Cadastradas
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-left:auto">
+              <input type="text" id="uni-busca" placeholder="Buscar unidade, cidade..." oninput="renderUnidades()"
+                style="padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;width:210px;outline:none;">
               <select id="uni-filtro-tipo" onchange="renderUnidades()"
-                style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+                style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
                 <option value="">Todas as situações</option>
                 <option value="Casa Construída">Casa Construída</option>
                 <option value="Terreno">Terreno</option>
-                <option value="__sem">Sem endereço</option>
               </select>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);cursor:pointer;user-select:none">
+                <input type="checkbox" id="uni-mostrar-todas" onchange="renderUnidades()" style="accent-color:var(--gold)">
+                Mostrar todas
+              </label>
             </div>
           </div>
           <div class="tbl-wrap">
             <table>
-              <thead><tr><th>Unidade</th><th>Situação</th><th>Nome</th><th>Rua</th><th>Nº</th><th>Bairro</th><th>Cidade</th><th>UF</th><th>Ações</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Unidade</th>
+                  <th>Situação</th>
+                  <th>Rua / Logradouro</th>
+                  <th>Nº</th>
+                  <th>Bairro</th>
+                  <th>Cidade</th>
+                  <th>UF</th>
+                  <th style="text-align:center">Ações</th>
+                </tr>
+              </thead>
               <tbody id="uni-tbody"></tbody>
             </table>
           </div>
@@ -3598,30 +3635,46 @@ function popUnidadeSelects(){
   }
 }
 
+function uniNovaUnidade(){
+  limparFormUnidade();
+  const fc = $('uni-form-card');
+  if(fc){ fc.style.display=''; fc.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+  const btn = $('uni-btn-novo');
+  if(btn) btn.style.display='none';
+}
+
+function uniFecharForm(){
+  limparFormUnidade();
+  const fc = $('uni-form-card');
+  if(fc) fc.style.display='none';
+  const btn = $('uni-btn-novo');
+  if(btn) btn.style.display='';
+}
+
 function renderUnidades(){
   popUnidadeSelects();
   const dados = getUnidades();
   const busca = ($('uni-busca')?.value || '').toLowerCase().trim();
   const fTipo = $('uni-filtro-tipo')?.value || '';
+  const mostrarTodas = $('uni-mostrar-todas')?.checked || false;
 
-  // Inclui todos do LOTES_PORTAL + qualquer código novo salvo manualmente
   const codsExtra = Object.keys(dados).filter(c=>!LOTES_PORTAL.includes(c));
   const todosOrdenados = [...LOTES_PORTAL, ...codsExtra.sort()];
 
   let linhas = todosOrdenados.map(cod=>{
     const d = dados[cod] || {};
-    return { cod, tipo:d.tipo||'', nome:d.nome||'', rua:d.rua||'', numero:d.numero||'',
+    return { cod, tipo:d.tipo||'', rua:d.rua||'', numero:d.numero||'',
              bairro:d.bairro||'', cidade:d.cidade||'', estado:d.estado||'',
-             temDados: !!(d.tipo||d.nome||d.rua||d.numero||d.bairro||d.cidade||d.estado) };
+             temDados: !!(d.tipo||d.rua||d.numero||d.bairro||d.cidade||d.estado) };
   });
 
-  if(fTipo === '__sem')  linhas = linhas.filter(l=>!l.temDados);
-  else if(fTipo)         linhas = linhas.filter(l=>l.tipo===fTipo);
-
+  if(!mostrarTodas) linhas = linhas.filter(l=>l.temDados);
+  if(fTipo) linhas = linhas.filter(l=>l.tipo===fTipo);
   if(busca){
     linhas = linhas.filter(l =>
-      l.cod.toLowerCase().includes(busca) || l.nome.toLowerCase().includes(busca) ||
-      l.cidade.toLowerCase().includes(busca) || l.bairro.toLowerCase().includes(busca) ||
+      l.cod.toLowerCase().includes(busca) ||
+      l.cidade.toLowerCase().includes(busca) ||
+      l.bairro.toLowerCase().includes(busca) ||
       l.rua.toLowerCase().includes(busca));
   }
 
@@ -3637,17 +3690,18 @@ function renderUnidades(){
     tb.innerHTML = linhas.length ? linhas.map(l=>`<tr>
       <td><span style="font-weight:700;color:var(--gold);background:rgba(232,119,34,0.12);border:1px solid rgba(232,119,34,0.25);border-radius:6px;padding:2px 8px;font-size:12px">${escU(l.cod)}</span></td>
       <td>${badgeTipo(l.tipo)}</td>
-      <td>${dash(l.nome)}</td>
       <td>${dash(l.rua)}</td>
       <td>${dash(l.numero)}</td>
       <td>${dash(l.bairro)}</td>
       <td>${dash(l.cidade)}</td>
       <td>${dash(l.estado)}</td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-ghost btn-sm" onclick="editarUnidade('${escU(l.cod)}')">✏️ Editar</button>
-        ${l.temDados ? `<button class="btn btn-ghost btn-sm" onclick="excluirUnidade('${escU(l.cod)}')" style="color:var(--red)">🗑️</button>` : ''}
+      <td style="text-align:center;white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="editarUnidade('${escU(l.cod)}')"><i class="fa-solid fa-pen-to-square"></i> Editar</button>
+        ${l.temDados ? `<button class="btn btn-ghost btn-sm" onclick="excluirUnidade('${escU(l.cod)}')" style="color:var(--red);margin-left:4px"><i class="fa-solid fa-trash"></i></button>` : ''}
       </td>
-    </tr>`).join('') : '<tr><td colspan="9" style="text-align:center;color:var(--text-3);padding:24px">Nenhuma unidade encontrada.</td></tr>';
+    </tr>`).join('') : `<tr><td colspan="8" style="text-align:center;color:var(--text-3);padding:32px">
+      ${mostrarTodas ? 'Nenhuma unidade encontrada.' : 'Nenhuma unidade cadastrada ainda. Clique em <strong>+ Nova Unidade</strong> para começar.'}
+    </td></tr>`;
   }
 
   const cnt = $('uni-count');
@@ -3655,7 +3709,7 @@ function renderUnidades(){
     const allCods = Object.keys(dados);
     const casas    = allCods.filter(c=>dados[c]&&dados[c].tipo==='Casa Construída').length;
     const terrenos = allCods.filter(c=>dados[c]&&dados[c].tipo==='Terreno').length;
-    cnt.textContent = `${allCods.length} cadastradas · ${casas} casas · ${terrenos} terrenos`;
+    cnt.textContent = `${allCods.length} unidades · ${casas} casas · ${terrenos} terrenos`;
   }
 }
 
@@ -3665,7 +3719,6 @@ function salvarUnidade(){
   if(!cod){ toast('⚠️ Informe o código da unidade.'); return; }
   const reg = {
     tipo:   $('uni-tipo').value,
-    nome:   $('uni-nome').value.trim(),
     rua:    $('uni-rua').value.trim(),
     numero: $('uni-numero').value.trim(),
     bairro: $('uni-bairro').value.trim(),
@@ -3676,7 +3729,7 @@ function salvarUnidade(){
   dados[cod] = reg;
   S('unidades', dados);
   toast('✅ Unidade '+cod+' salva!');
-  limparFormUnidade();
+  uniFecharForm();
   renderUnidades();
 }
 
@@ -3685,18 +3738,20 @@ function editarUnidade(cod){
   const d = getUnidades()[cod] || {};
   $('uni-cod').value    = cod;
   $('uni-tipo').value   = d.tipo||'';
-  $('uni-nome').value   = d.nome||'';
   $('uni-rua').value    = d.rua||'';
   $('uni-numero').value = d.numero||'';
   $('uni-bairro').value = d.bairro||'';
   $('uni-cidade').value = d.cidade||'';
   $('uni-estado').value = d.estado||'';
-  $('uni-form-title').textContent = 'Editar Unidade '+cod;
-  $('panel-unidades').scrollIntoView({behavior:'smooth',block:'start'});
+  $('uni-form-title').textContent = 'Editar Unidade — '+cod;
+  const fc = $('uni-form-card');
+  if(fc){ fc.style.display=''; fc.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+  const btn = $('uni-btn-novo');
+  if(btn) btn.style.display='none';
 }
 
 function excluirUnidade(cod){
-  if(!confirm('Remover os dados da unidade '+cod+'?')) return;
+  if(!confirm('Remover os dados cadastrados da unidade '+cod+'?')) return;
   const dados = getUnidades();
   delete dados[cod];
   S('unidades', dados);
@@ -3705,7 +3760,7 @@ function excluirUnidade(cod){
 }
 
 function limparFormUnidade(){
-  ['uni-cod','uni-nome','uni-rua','uni-numero','uni-bairro','uni-cidade'].forEach(id=>{ if($(id)) $(id).value=''; });
+  ['uni-cod','uni-rua','uni-numero','uni-bairro','uni-cidade'].forEach(id=>{ if($(id)) $(id).value=''; });
   if($('uni-tipo'))   $('uni-tipo').value='';
   if($('uni-estado')) $('uni-estado').value='';
   if($('uni-form-title')) $('uni-form-title').textContent='Nova Unidade';
