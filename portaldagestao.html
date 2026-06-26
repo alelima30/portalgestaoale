@@ -406,13 +406,43 @@ body{
   letter-spacing:2px;text-transform:uppercase;
   margin-top:9px;
 }
-.sb-nav{flex:1;padding:14px 10px;overflow-y:auto}
-.sb-section{
-  font-size:9px;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;
-  color:rgba(174,190,220,0.38);padding:0 10px;
-  margin:16px 0 5px;
+.sb-nav{flex:1;padding:10px 10px 14px;overflow-y:auto}
+
+/* ── Accordion grupo ── */
+.sb-group{margin-bottom:2px}
+.sb-group-hd{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  cursor:pointer;
+  color:rgba(174,190,220,0.75);font-size:13.5px;font-weight:500;
+  transition:all 0.15s;
+  position:relative;overflow:hidden;
+  user-select:none;
 }
+.sb-group-hd:hover{background:rgba(255,255,255,0.06);color:#EEF1F8}
+.sb-group-hd.open{color:#EEF1F8}
+.sb-group-arrow{
+  margin-left:auto;font-size:10px;
+  color:rgba(174,190,220,0.4);
+  transition:transform 0.22s ease;
+  flex-shrink:0;
+}
+.sb-group-hd.open .sb-group-arrow{transform:rotate(90deg);color:rgba(232,119,34,0.8)}
+.sb-group-body{
+  overflow:hidden;
+  max-height:0;
+  transition:max-height 0.28s ease;
+}
+.sb-group-body.open{max-height:600px}
+.sb-group-body .nav-item{
+  padding-left:22px;
+  font-size:13px;
+}
+
+/* item standalone (Dashboard) */
+.nav-standalone{margin-bottom:2px}
+
+/* ── Nav item ── */
 .nav-item{
   display:flex;align-items:center;gap:10px;
   padding:10px 12px;border-radius:10px;
@@ -1441,59 +1471,103 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
         <p class="sb-tagline">Gestão Inteligente</p>
     </div>
     <div class="sb-nav">
-      <div class="sb-section" data-acesso="admin,gestor">Início</div>
-      <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('dashboard',this)">
-        <div class="nav-icon"><i class="fa-solid fa-gauge-high"></i></div>Dashboard
+
+      <!-- Dashboard standalone -->
+      <div class="nav-standalone" data-acesso="admin,gestor">
+        <div class="nav-item" onclick="showPanel('dashboard',this)">
+          <div class="nav-icon"><i class="fa-solid fa-gauge-high"></i></div>Dashboard
+        </div>
       </div>
-      <div class="sb-section" data-acesso="admin,gestor">Painéis</div>
-      <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('lotes',this)">
-        <div class="nav-icon"><i class="fa-solid fa-map-location-dot"></i></div>Censo de Lotes
+
+      <!-- GRUPO: Painéis -->
+      <div class="sb-group" data-acesso="admin,gestor">
+        <div class="sb-group-hd" onclick="sbToggle(this)">
+          <div class="nav-icon"><i class="fa-solid fa-chart-bar"></i></div>
+          Painéis
+          <span class="sb-group-arrow">&#9654;</span>
+        </div>
+        <div class="sb-group-body">
+          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('lotes',this)">
+            <div class="nav-icon"><i class="fa-solid fa-map-location-dot"></i></div>Censo de Lotes
+          </div>
+          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('funcionarios',this)">
+            <div class="nav-icon"><i class="fa-solid fa-users"></i></div>Funcionários
+          </div>
+          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('financeiro',this)">
+            <div class="nav-icon"><i class="fa-solid fa-wallet"></i></div>Financeiro
+          </div>
+          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('inadimplencia',this)">
+            <div class="nav-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>Inadimplência
+          </div>
+        </div>
       </div>
-      <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('funcionarios',this)">
-        <div class="nav-icon"><i class="fa-solid fa-users"></i></div>Funcionários
+
+      <!-- GRUPO: Cadastro -->
+      <div class="sb-group" data-acesso="admin,gestor">
+        <div class="sb-group-hd" onclick="sbToggle(this)">
+          <div class="nav-icon"><i class="fa-solid fa-folder-plus"></i></div>
+          Cadastro
+          <span class="sb-group-arrow">&#9654;</span>
+        </div>
+        <div class="sb-group-body">
+          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('unidades',this)">
+            <div class="nav-icon"><i class="fa-solid fa-house-chimney"></i></div>Cadastro de Unidades
+          </div>
+        </div>
       </div>
-      <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('financeiro',this)">
-        <div class="nav-icon"><i class="fa-solid fa-wallet"></i></div>Financeiro
+
+      <!-- GRUPO: Operações -->
+      <div class="sb-group" data-acesso="admin,gestor,morador">
+        <div class="sb-group-hd" onclick="sbToggle(this)">
+          <div class="nav-icon"><i class="fa-solid fa-layer-group"></i></div>
+          Operações
+          <span class="sb-group-arrow">&#9654;</span>
+        </div>
+        <div class="sb-group-body">
+          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('manutencao',this)">
+            <div class="nav-icon"><i class="fa-solid fa-wrench"></i></div>Manutenção
+          </div>
+          <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('preventivas',this)">
+            <div class="nav-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>Preventivas & Corretivas
+          </div>
+          <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('comunicados',this)">
+            <div class="nav-icon"><i class="fa-solid fa-bullhorn"></i></div>Comunicados
+          </div>
+          <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('eventos',this)">
+            <div class="nav-icon"><i class="fa-solid fa-calendar-day"></i></div>Eventos
+          </div>
+          <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('reservas',this)">
+            <div class="nav-icon"><i class="fa-solid fa-calendar-check"></i></div>Reservas
+          </div>
+          <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('regulamento',this)">
+            <div class="nav-icon"><i class="fa-solid fa-scroll"></i></div>Regulamentos
+          </div>
+          <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('procedimentos',this)">
+            <div class="nav-icon"><i class="fa-solid fa-clipboard-list"></i></div>Procedimentos
+          </div>
+        </div>
       </div>
-      <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('inadimplencia',this)">
-        <div class="nav-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>Inadimplência
+
+      <!-- GRUPO: Sistema (admin only) -->
+      <div class="sb-group" data-acesso="admin">
+        <div class="sb-group-hd" onclick="sbToggle(this)">
+          <div class="nav-icon"><i class="fa-solid fa-sliders"></i></div>
+          Sistema
+          <span class="sb-group-arrow">&#9654;</span>
+        </div>
+        <div class="sb-group-body">
+          <div class="nav-item" data-acesso="admin" onclick="showPanel('usuarios',this)">
+            <div class="nav-icon"><i class="fa-solid fa-users-gear"></i></div>Usuários
+          </div>
+          <div class="nav-item" data-acesso="admin" onclick="showPanel('configuracoes',this)">
+            <div class="nav-icon"><i class="fa-solid fa-gear"></i></div>Configurações
+          </div>
+          <div class="nav-item" data-acesso="admin" onclick="showPanel('admfotos',this)">
+            <div class="nav-icon"><i class="fa-solid fa-images"></i></div>Adm. Fotos
+          </div>
+        </div>
       </div>
-      <div class="sb-section" data-acesso="admin,gestor">Cadastro</div>
-      <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('unidades',this)">
-        <div class="nav-icon"><i class="fa-solid fa-house-chimney"></i></div>Cadastrar Unidades
-      </div>
-      <div class="sb-section" data-acesso="admin,gestor,morador">Operações</div>
-      <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('manutencao',this)">
-        <div class="nav-icon"><i class="fa-solid fa-wrench"></i></div>Manutenção
-      </div>
-      <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('preventivas',this)">
-        <div class="nav-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>Preventivas & Corretivas
-      </div>
-      <div class="nav-item active" data-acesso="admin,gestor,morador" onclick="showPanel('comunicados',this)">
-        <div class="nav-icon"><i class="fa-solid fa-bullhorn"></i></div>Comunicados
-      </div>
-      <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('eventos',this)">
-        <div class="nav-icon"><i class="fa-solid fa-calendar-day"></i></div>Eventos
-      </div>
-      <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('reservas',this)">
-        <div class="nav-icon"><i class="fa-solid fa-calendar-check"></i></div>Reservas
-      </div>
-      <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('regulamento',this)">
-        <div class="nav-icon"><i class="fa-solid fa-scroll"></i></div>Regulamentos
-      </div>
-      <div class="nav-item" data-acesso="admin,gestor,morador" onclick="showPanel('procedimentos',this)">
-        <div class="nav-icon"><i class="fa-solid fa-clipboard-list"></i></div>Procedimentos
-      </div>
-      <div class="sb-section" data-acesso="admin">Sistema</div>
-      <div class="nav-item" data-acesso="admin" onclick="showPanel('usuarios',this)">
-        <div class="nav-icon"><i class="fa-solid fa-users-gear"></i></div>Usuários
-      </div>
-      <div class="nav-item" data-acesso="admin" onclick="showPanel('configuracoes',this)">
-        <div class="nav-icon"><i class="fa-solid fa-gear"></i></div>Configurações
-      </div>
-      <div class="nav-item" data-acesso="admin" onclick="showPanel('admfotos',this)">
-        <div class="nav-icon"><i class="fa-solid fa-images"></i></div>Adm. Fotos
-      </div>
+
     </div>
     <div class="sb-foot">
       <div class="sb-user">
@@ -1589,7 +1663,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
       <!-- ████ CADASTRO: UNIDADES ████ -->
       <div class="panel" id="panel-unidades">
         <div class="ph">
-          <div><div class="ph-title">Cadastrar Unidades</div><div class="ph-sub">Endereço, responsável e situação de cada unidade</div></div>
+          <div><div class="ph-title">Cadastro de Unidades</div><div class="ph-sub">Endereço, responsável e situação de cada unidade</div></div>
           <div class="ph-actions">
             <span id="uni-count" style="font-size:12px;color:var(--text-3)"></span>
           </div>
@@ -1602,8 +1676,9 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
           </div>
           <div class="form-grid">
             <div class="fg">
-              <label>Unidade</label>
-              <select id="uni-cod"></select>
+              <label>Unidade <small style="color:var(--text-3);font-weight:400">(ex: A01, M05 — nova ou existente)</small></label>
+              <input type="text" id="uni-cod" list="uni-cod-dl" placeholder="Selecione ou digite a unidade" autocomplete="off" style="text-transform:uppercase">
+              <datalist id="uni-cod-dl"></datalist>
             </div>
             <div class="fg">
               <label>Situação</label>
@@ -3510,7 +3585,7 @@ function closeSidebar(){
 }
 
 /* ══ NAVIGATION ══ */
-const panelNames={dashboard:'Dashboard',lotes:'Censo de Lotes',funcionarios:'Funcionários',financeiro:'Financeiro',manutencao:'Manutenção & Serviços',comunicados:'Comunicados',eventos:'Eventos',preventivas:'Preventivas & Corretivas',reservas:'Gestão de Reservas',regulamento:'Regulamentos',inadimplencia:'Inadimplência',usuarios:'Gestão de Usuários',configuracoes:'Configurações',procedimentos:'Procedimentos',unidades:'Cadastrar Unidades'};
+const panelNames={dashboard:'Dashboard',lotes:'Censo de Lotes',funcionarios:'Funcionários',financeiro:'Financeiro',manutencao:'Manutenção & Serviços',comunicados:'Comunicados',eventos:'Eventos',preventivas:'Preventivas & Corretivas',reservas:'Gestão de Reservas',regulamento:'Regulamentos',inadimplencia:'Inadimplência',usuarios:'Gestão de Usuários',configuracoes:'Configurações',procedimentos:'Procedimentos',unidades:'Cadastro de Unidades'};
 const ACESSO_PAINEIS = {
   admin:   ['dashboard','lotes','unidades','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','comunicados','eventos','regulamento','usuarios','configuracoes','admfotos','procedimentos'],
   gestor:  ['dashboard','lotes','unidades','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','comunicados','eventos','regulamento','procedimentos'],
@@ -3527,10 +3602,10 @@ function escU(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g
 function getUnidades(){ const u = G('unidades'); return (u && typeof u==='object' && !Array.isArray(u)) ? u : {}; }
 
 function popUnidadeSelects(){
-  const selCod = $('uni-cod');
-  if(selCod && !selCod._filled){
-    selCod.innerHTML = LOTES_PORTAL.map(c=>`<option value="${c}">${c}</option>`).join('');
-    selCod._filled = true;
+  const dl = $('uni-cod-dl');
+  if(dl && !dl._filled){
+    dl.innerHTML = LOTES_PORTAL.map(c=>`<option value="${c}">`).join('');
+    dl._filled = true;
   }
   const selUf = $('uni-estado');
   if(selUf && !selUf._filled){
@@ -3545,15 +3620,19 @@ function renderUnidades(){
   const busca = ($('uni-busca')?.value || '').toLowerCase().trim();
   const fTipo = $('uni-filtro-tipo')?.value || '';
 
-  let linhas = LOTES_PORTAL.map(cod=>{
+  // Inclui todos do LOTES_PORTAL + qualquer código novo salvo manualmente
+  const codsExtra = Object.keys(dados).filter(c=>!LOTES_PORTAL.includes(c));
+  const todosOrdenados = [...LOTES_PORTAL, ...codsExtra.sort()];
+
+  let linhas = todosOrdenados.map(cod=>{
     const d = dados[cod] || {};
     return { cod, tipo:d.tipo||'', nome:d.nome||'', rua:d.rua||'', numero:d.numero||'',
              bairro:d.bairro||'', cidade:d.cidade||'', estado:d.estado||'',
              temDados: !!(d.tipo||d.nome||d.rua||d.numero||d.bairro||d.cidade||d.estado) };
   });
 
-  if(fTipo === '__sem')      linhas = linhas.filter(l=>!l.temDados);
-  else if(fTipo)             linhas = linhas.filter(l=>l.tipo===fTipo);
+  if(fTipo === '__sem')  linhas = linhas.filter(l=>!l.temDados);
+  else if(fTipo)         linhas = linhas.filter(l=>l.tipo===fTipo);
 
   if(busca){
     linhas = linhas.filter(l =>
@@ -3572,7 +3651,7 @@ function renderUnidades(){
   const tb = $('uni-tbody');
   if(tb){
     tb.innerHTML = linhas.length ? linhas.map(l=>`<tr>
-      <td><span style="font-weight:700;color:var(--gold);background:rgba(232,119,34,0.12);border:1px solid rgba(232,119,34,0.25);border-radius:6px;padding:2px 8px;font-size:12px">${l.cod}</span></td>
+      <td><span style="font-weight:700;color:var(--gold);background:rgba(232,119,34,0.12);border:1px solid rgba(232,119,34,0.25);border-radius:6px;padding:2px 8px;font-size:12px">${escU(l.cod)}</span></td>
       <td>${badgeTipo(l.tipo)}</td>
       <td>${dash(l.nome)}</td>
       <td>${dash(l.rua)}</td>
@@ -3581,26 +3660,25 @@ function renderUnidades(){
       <td>${dash(l.cidade)}</td>
       <td>${dash(l.estado)}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-ghost btn-sm" onclick="editarUnidade('${l.cod}')">✏️ Editar</button>
-        ${l.temDados ? `<button class="btn btn-ghost btn-sm" onclick="excluirUnidade('${l.cod}')" style="color:var(--red)">🗑️</button>` : ''}
+        <button class="btn btn-ghost btn-sm" onclick="editarUnidade('${escU(l.cod)}')">✏️ Editar</button>
+        ${l.temDados ? `<button class="btn btn-ghost btn-sm" onclick="excluirUnidade('${escU(l.cod)}')" style="color:var(--red)">🗑️</button>` : ''}
       </td>
     </tr>`).join('') : '<tr><td colspan="9" style="text-align:center;color:var(--text-3);padding:24px">Nenhuma unidade encontrada.</td></tr>';
   }
 
   const cnt = $('uni-count');
   if(cnt){
-    const total = LOTES_PORTAL.length;
-    const comDados = LOTES_PORTAL.filter(c=>dados[c]).length;
-    const casas = LOTES_PORTAL.filter(c=>dados[c]&&dados[c].tipo==='Casa Construída').length;
-    const terrenos = LOTES_PORTAL.filter(c=>dados[c]&&dados[c].tipo==='Terreno').length;
-    cnt.textContent = `${comDados}/${total} cadastradas · ${casas} casas · ${terrenos} terrenos`;
+    const allCods = Object.keys(dados);
+    const casas    = allCods.filter(c=>dados[c]&&dados[c].tipo==='Casa Construída').length;
+    const terrenos = allCods.filter(c=>dados[c]&&dados[c].tipo==='Terreno').length;
+    cnt.textContent = `${allCods.length} cadastradas · ${casas} casas · ${terrenos} terrenos`;
   }
 }
 
 function salvarUnidade(){
   popUnidadeSelects();
-  const cod = $('uni-cod').value;
-  if(!cod){ toast('⚠️ Selecione a unidade.'); return; }
+  const cod = ($('uni-cod').value || '').trim().toUpperCase();
+  if(!cod){ toast('⚠️ Informe o código da unidade.'); return; }
   const reg = {
     tipo:   $('uni-tipo').value,
     nome:   $('uni-nome').value.trim(),
@@ -3643,10 +3721,26 @@ function excluirUnidade(cod){
 }
 
 function limparFormUnidade(){
-  ['uni-nome','uni-rua','uni-numero','uni-bairro','uni-cidade'].forEach(id=>{ if($(id)) $(id).value=''; });
+  ['uni-cod','uni-nome','uni-rua','uni-numero','uni-bairro','uni-cidade'].forEach(id=>{ if($(id)) $(id).value=''; });
   if($('uni-tipo'))   $('uni-tipo').value='';
   if($('uni-estado')) $('uni-estado').value='';
   if($('uni-form-title')) $('uni-form-title').textContent='Nova Unidade';
+}
+
+/* \u2500\u2500 Accordion sidebar \u2500\u2500 */
+function sbToggle(hd){
+  const body = hd.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  hd.classList.toggle('open', !isOpen);
+}
+
+function sbOpenParent(navItem){
+  const body = navItem.closest('.sb-group-body');
+  if(!body) return;
+  body.classList.add('open');
+  const hd = body.previousElementSibling;
+  if(hd) hd.classList.add('open');
 }
 
 function showPanel(id,el){
@@ -3656,7 +3750,7 @@ function showPanel(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   $('panel-'+id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  if(el) el.classList.add('active');
+  if(el){ el.classList.add('active'); sbOpenParent(el); }
   $('tb-crumb').textContent=panelNames[id];
   ({dashboard:renderDashboard,lotes:renderLotes,unidades:renderUnidades,funcionarios:renderFTabela,financeiro:renderFin,manutencao:renderManut,comunicados:renderComun,eventos:renderEventos,preventivas:renderPreventivas,reservas:()=>{renderReservas();verificarAlertas();},regulamento:renderReg,inadimplencia:renderInadimplencia,usuarios:renderUsuarios,configuracoes:()=>{renderCfgReservas()}})[id]?.();
   closeSidebar();
