@@ -1458,6 +1458,10 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
       <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('inadimplencia',this)">
         <div class="nav-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>Inadimplência
       </div>
+      <div class="sb-section" data-acesso="admin,gestor">Cadastro</div>
+      <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('unidades',this)">
+        <div class="nav-icon"><i class="fa-solid fa-house-chimney"></i></div>Cadastrar Unidades
+      </div>
       <div class="sb-section" data-acesso="admin,gestor,morador">Operações</div>
       <div class="nav-item" data-acesso="admin,gestor" onclick="showPanel('manutencao',this)">
         <div class="nav-icon"><i class="fa-solid fa-wrench"></i></div>Manutenção
@@ -1577,6 +1581,74 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
             <table>
               <thead><tr><th>Período</th><th>Lotes</th><th>Construídas</th><th>Fixos</th><th>Veraneio</th><th>Vazios</th><th>Obras</th><th>Paradas</th><th>APVC</th></tr></thead>
               <tbody id="lhist"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ████ CADASTRO: UNIDADES ████ -->
+      <div class="panel" id="panel-unidades">
+        <div class="ph">
+          <div><div class="ph-title">Cadastrar Unidades</div><div class="ph-sub">Endereço, responsável e situação de cada unidade</div></div>
+          <div class="ph-actions">
+            <span id="uni-count" style="font-size:12px;color:var(--text-3)"></span>
+          </div>
+        </div>
+
+        <!-- Formulário -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head">
+            <div class="card-title"><div class="card-icon">🏠</div><span id="uni-form-title">Nova Unidade</span></div>
+          </div>
+          <div class="form-grid">
+            <div class="fg">
+              <label>Unidade</label>
+              <select id="uni-cod"></select>
+            </div>
+            <div class="fg">
+              <label>Situação</label>
+              <select id="uni-tipo">
+                <option value="">Selecione...</option>
+                <option value="Casa Construída">Casa Construída</option>
+                <option value="Terreno">Terreno</option>
+              </select>
+            </div>
+            <div class="fg"><label>Nome (responsável / morador)</label><input type="text" id="uni-nome" placeholder="Ex: João da Silva"></div>
+            <div class="fg"><label>Rua</label><input type="text" id="uni-rua" placeholder="Ex: Rua das Palmeiras"></div>
+            <div class="fg"><label>Número</label><input type="text" id="uni-numero" placeholder="Ex: 123"></div>
+            <div class="fg"><label>Bairro</label><input type="text" id="uni-bairro" placeholder="Ex: Centro"></div>
+            <div class="fg"><label>Cidade</label><input type="text" id="uni-cidade" placeholder="Ex: Florianópolis"></div>
+            <div class="fg">
+              <label>Estado</label>
+              <select id="uni-estado"></select>
+            </div>
+          </div>
+          <div class="modal-actions" style="margin-top:4px">
+            <button class="btn btn-ghost" onclick="limparFormUnidade()">Limpar</button>
+            <button class="btn btn-gold" onclick="salvarUnidade()">💾 Salvar Unidade</button>
+          </div>
+        </div>
+
+        <!-- Lista de unidades -->
+        <div class="card">
+          <div class="card-head" style="flex-wrap:wrap;gap:10px">
+            <div class="card-title"><div class="card-icon">📋</div>Unidades Cadastradas</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <input type="text" id="uni-busca" placeholder="🔍 Buscar unidade, nome, cidade..." oninput="renderUnidades()"
+                style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;width:240px;outline:none;">
+              <select id="uni-filtro-tipo" onchange="renderUnidades()"
+                style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;">
+                <option value="">Todas as situações</option>
+                <option value="Casa Construída">Casa Construída</option>
+                <option value="Terreno">Terreno</option>
+                <option value="__sem">Sem endereço</option>
+              </select>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Unidade</th><th>Situação</th><th>Nome</th><th>Rua</th><th>Nº</th><th>Bairro</th><th>Cidade</th><th>UF</th><th>Ações</th></tr></thead>
+              <tbody id="uni-tbody"></tbody>
             </table>
           </div>
         </div>
@@ -3061,7 +3133,7 @@ async function uploadPDF(file, pasta){
 
 // Cache local — mantém toda a lógica sync original intacta
 const DB_CACHE = {};
-const DB_KEYS = ['lotes','funcs','fin','manut','comun','prev','reservas','reg','inadimplencia'];
+const DB_KEYS = ['lotes','funcs','fin','manut','comun','prev','reservas','reg','inadimplencia','unidades'];
 
 // Lê do cache (síncrono — igual ao localStorage antes)
 const G = k => (DB_CACHE[k] !== undefined) ? DB_CACHE[k] : null;
@@ -3438,12 +3510,145 @@ function closeSidebar(){
 }
 
 /* ══ NAVIGATION ══ */
-const panelNames={dashboard:'Dashboard',lotes:'Censo de Lotes',funcionarios:'Funcionários',financeiro:'Financeiro',manutencao:'Manutenção & Serviços',comunicados:'Comunicados',eventos:'Eventos',preventivas:'Preventivas & Corretivas',reservas:'Gestão de Reservas',regulamento:'Regulamentos',inadimplencia:'Inadimplência',usuarios:'Gestão de Usuários',configuracoes:'Configurações',procedimentos:'Procedimentos'};
+const panelNames={dashboard:'Dashboard',lotes:'Censo de Lotes',funcionarios:'Funcionários',financeiro:'Financeiro',manutencao:'Manutenção & Serviços',comunicados:'Comunicados',eventos:'Eventos',preventivas:'Preventivas & Corretivas',reservas:'Gestão de Reservas',regulamento:'Regulamentos',inadimplencia:'Inadimplência',usuarios:'Gestão de Usuários',configuracoes:'Configurações',procedimentos:'Procedimentos',unidades:'Cadastrar Unidades'};
 const ACESSO_PAINEIS = {
-  admin:   ['dashboard','lotes','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','comunicados','eventos','regulamento','usuarios','configuracoes','admfotos','procedimentos'],
-  gestor:  ['dashboard','lotes','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','comunicados','eventos','regulamento','procedimentos'],
+  admin:   ['dashboard','lotes','unidades','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','comunicados','eventos','regulamento','usuarios','configuracoes','admfotos','procedimentos'],
+  gestor:  ['dashboard','lotes','unidades','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','comunicados','eventos','regulamento','procedimentos'],
   morador: ['reservas','comunicados','eventos','regulamento','procedimentos']
 };
+/* ══════════════════════════
+   CADASTRO DE UNIDADES
+══════════════════════════ */
+const UF_LISTA = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+
+function escU(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// Mapa { 'A01': {tipo,nome,rua,numero,bairro,cidade,estado}, ... }
+function getUnidades(){ const u = G('unidades'); return (u && typeof u==='object' && !Array.isArray(u)) ? u : {}; }
+
+function popUnidadeSelects(){
+  const selCod = $('uni-cod');
+  if(selCod && !selCod._filled){
+    selCod.innerHTML = LOTES_PORTAL.map(c=>`<option value="${c}">${c}</option>`).join('');
+    selCod._filled = true;
+  }
+  const selUf = $('uni-estado');
+  if(selUf && !selUf._filled){
+    selUf.innerHTML = '<option value="">UF</option>' + UF_LISTA.map(u=>`<option value="${u}">${u}</option>`).join('');
+    selUf._filled = true;
+  }
+}
+
+function renderUnidades(){
+  popUnidadeSelects();
+  const dados = getUnidades();
+  const busca = ($('uni-busca')?.value || '').toLowerCase().trim();
+  const fTipo = $('uni-filtro-tipo')?.value || '';
+
+  let linhas = LOTES_PORTAL.map(cod=>{
+    const d = dados[cod] || {};
+    return { cod, tipo:d.tipo||'', nome:d.nome||'', rua:d.rua||'', numero:d.numero||'',
+             bairro:d.bairro||'', cidade:d.cidade||'', estado:d.estado||'',
+             temDados: !!(d.tipo||d.nome||d.rua||d.numero||d.bairro||d.cidade||d.estado) };
+  });
+
+  if(fTipo === '__sem')      linhas = linhas.filter(l=>!l.temDados);
+  else if(fTipo)             linhas = linhas.filter(l=>l.tipo===fTipo);
+
+  if(busca){
+    linhas = linhas.filter(l =>
+      l.cod.toLowerCase().includes(busca) || l.nome.toLowerCase().includes(busca) ||
+      l.cidade.toLowerCase().includes(busca) || l.bairro.toLowerCase().includes(busca) ||
+      l.rua.toLowerCase().includes(busca));
+  }
+
+  const dash = v => v ? escU(v) : '<span style="color:var(--text-3)">—</span>';
+  const badgeTipo = t => {
+    if(t==='Casa Construída') return '<span style="font-size:11px;font-weight:600;color:var(--green-l);background:rgba(24,160,104,0.12);border:1px solid rgba(24,160,104,0.25);border-radius:6px;padding:2px 8px">🏠 Casa</span>';
+    if(t==='Terreno')         return '<span style="font-size:11px;font-weight:600;color:var(--amber);background:rgba(240,168,67,0.12);border:1px solid rgba(240,168,67,0.28);border-radius:6px;padding:2px 8px">🟫 Terreno</span>';
+    return '<span style="color:var(--text-3)">—</span>';
+  };
+
+  const tb = $('uni-tbody');
+  if(tb){
+    tb.innerHTML = linhas.length ? linhas.map(l=>`<tr>
+      <td><span style="font-weight:700;color:var(--gold);background:rgba(232,119,34,0.12);border:1px solid rgba(232,119,34,0.25);border-radius:6px;padding:2px 8px;font-size:12px">${l.cod}</span></td>
+      <td>${badgeTipo(l.tipo)}</td>
+      <td>${dash(l.nome)}</td>
+      <td>${dash(l.rua)}</td>
+      <td>${dash(l.numero)}</td>
+      <td>${dash(l.bairro)}</td>
+      <td>${dash(l.cidade)}</td>
+      <td>${dash(l.estado)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="editarUnidade('${l.cod}')">✏️ Editar</button>
+        ${l.temDados ? `<button class="btn btn-ghost btn-sm" onclick="excluirUnidade('${l.cod}')" style="color:var(--red)">🗑️</button>` : ''}
+      </td>
+    </tr>`).join('') : '<tr><td colspan="9" style="text-align:center;color:var(--text-3);padding:24px">Nenhuma unidade encontrada.</td></tr>';
+  }
+
+  const cnt = $('uni-count');
+  if(cnt){
+    const total = LOTES_PORTAL.length;
+    const comDados = LOTES_PORTAL.filter(c=>dados[c]).length;
+    const casas = LOTES_PORTAL.filter(c=>dados[c]&&dados[c].tipo==='Casa Construída').length;
+    const terrenos = LOTES_PORTAL.filter(c=>dados[c]&&dados[c].tipo==='Terreno').length;
+    cnt.textContent = `${comDados}/${total} cadastradas · ${casas} casas · ${terrenos} terrenos`;
+  }
+}
+
+function salvarUnidade(){
+  popUnidadeSelects();
+  const cod = $('uni-cod').value;
+  if(!cod){ toast('⚠️ Selecione a unidade.'); return; }
+  const reg = {
+    tipo:   $('uni-tipo').value,
+    nome:   $('uni-nome').value.trim(),
+    rua:    $('uni-rua').value.trim(),
+    numero: $('uni-numero').value.trim(),
+    bairro: $('uni-bairro').value.trim(),
+    cidade: $('uni-cidade').value.trim(),
+    estado: $('uni-estado').value,
+  };
+  const dados = getUnidades();
+  dados[cod] = reg;
+  S('unidades', dados);
+  toast('✅ Unidade '+cod+' salva!');
+  limparFormUnidade();
+  renderUnidades();
+}
+
+function editarUnidade(cod){
+  popUnidadeSelects();
+  const d = getUnidades()[cod] || {};
+  $('uni-cod').value    = cod;
+  $('uni-tipo').value   = d.tipo||'';
+  $('uni-nome').value   = d.nome||'';
+  $('uni-rua').value    = d.rua||'';
+  $('uni-numero').value = d.numero||'';
+  $('uni-bairro').value = d.bairro||'';
+  $('uni-cidade').value = d.cidade||'';
+  $('uni-estado').value = d.estado||'';
+  $('uni-form-title').textContent = 'Editar Unidade '+cod;
+  $('panel-unidades').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function excluirUnidade(cod){
+  if(!confirm('Remover os dados da unidade '+cod+'?')) return;
+  const dados = getUnidades();
+  delete dados[cod];
+  S('unidades', dados);
+  toast('🗑️ Dados da unidade '+cod+' removidos.');
+  renderUnidades();
+}
+
+function limparFormUnidade(){
+  ['uni-nome','uni-rua','uni-numero','uni-bairro','uni-cidade'].forEach(id=>{ if($(id)) $(id).value=''; });
+  if($('uni-tipo'))   $('uni-tipo').value='';
+  if($('uni-estado')) $('uni-estado').value='';
+  if($('uni-form-title')) $('uni-form-title').textContent='Nova Unidade';
+}
+
 function showPanel(id,el){
   const nivel = window._userNivel || 'morador';
   const permitidos = ACESSO_PAINEIS[nivel] || ACESSO_PAINEIS.morador;
@@ -3453,7 +3658,7 @@ function showPanel(id,el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(el) el.classList.add('active');
   $('tb-crumb').textContent=panelNames[id];
-  ({dashboard:renderDashboard,lotes:renderLotes,funcionarios:renderFTabela,financeiro:renderFin,manutencao:renderManut,comunicados:renderComun,eventos:renderEventos,preventivas:renderPreventivas,reservas:()=>{renderReservas();verificarAlertas();},regulamento:renderReg,inadimplencia:renderInadimplencia,usuarios:renderUsuarios,configuracoes:()=>{renderCfgReservas()}})[id]?.();
+  ({dashboard:renderDashboard,lotes:renderLotes,unidades:renderUnidades,funcionarios:renderFTabela,financeiro:renderFin,manutencao:renderManut,comunicados:renderComun,eventos:renderEventos,preventivas:renderPreventivas,reservas:()=>{renderReservas();verificarAlertas();},regulamento:renderReg,inadimplencia:renderInadimplencia,usuarios:renderUsuarios,configuracoes:()=>{renderCfgReservas()}})[id]?.();
   closeSidebar();
 }
 
