@@ -2955,7 +2955,13 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:18px">
+        <!-- Abas de configuração -->
+        <div class="tabs" style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="tab active" id="cfgtab-reservas" onclick="cfgSetTab('reservas')"><i class="fa-solid fa-calendar-check" style="margin-right:6px"></i>Configuração das Reservas</button>
+          <button class="tab" id="cfgtab-sistema" onclick="cfgSetTab('sistema')"><i class="fa-solid fa-plug" style="margin-right:6px"></i>Integrações & Sistema</button>
+        </div>
+
+        <div class="cfg-card cfg-grp-sistema card" style="margin-bottom:18px;display:none">
           <div class="card-head">
             <div class="card-title"><div class="card-icon">📱</div>Z-API — WhatsApp Automático</div>
             <span id="cfg-zapi-status" style="font-size:12px;color:var(--text-3)">Não configurado</span>
@@ -2977,7 +2983,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:18px">
+        <div class="cfg-card cfg-grp-sistema card" style="margin-bottom:18px;display:none">
           <div class="card-head">
             <div class="card-title"><div class="card-icon">✉️</div>EmailJS — E-mail Automático</div>
             <span id="cfg-ejs-status" style="font-size:12px;color:var(--text-3)">Não configurado</span>
@@ -3004,7 +3010,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
         </div>
 
         <!-- ▸ Config de Reservas: termos e caução -->
-        <div class="card" style="margin-bottom:18px">
+        <div class="cfg-card cfg-grp-reservas card" style="margin-bottom:18px">
           <div class="card-head">
             <div class="card-title"><div class="card-icon">📝</div>Termos de Responsabilidade & Valores por Espaço</div>
             <button class="btn btn-gold btn-sm" onclick="salvarCfgReservas()">💾 Salvar</button>
@@ -3024,7 +3030,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
         </div>
 
         <!-- ▸ Disponibilidade: dias da semana + limite de horas por morador -->
-        <div class="card" style="margin-bottom:18px">
+        <div class="cfg-card cfg-grp-reservas card" style="margin-bottom:18px">
           <div class="card-head">
             <div class="card-title"><div class="card-icon" style="background:rgba(232,119,34,0.14);color:var(--gold)"><i class="fa-solid fa-calendar-day"></i></div>Disponibilidade por Espaço</div>
             <button class="btn btn-gold btn-sm" onclick="salvarCfgReservas()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
@@ -3033,8 +3039,18 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
           <div id="cfg-disp-espacos" style="display:flex;flex-direction:column;gap:12px"></div>
         </div>
 
+        <!-- ▸ Mensagem exibida ao morador após reservar (quando exige validação) -->
+        <div class="cfg-card cfg-grp-reservas card" style="margin-bottom:18px">
+          <div class="card-head">
+            <div class="card-title"><div class="card-icon" style="background:rgba(232,119,34,0.14);color:var(--gold)"><i class="fa-regular fa-comment-dots"></i></div>Mensagem após a reserva</div>
+            <button class="btn btn-gold btn-sm" onclick="salvarCfgReservas()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+          </div>
+          <div style="font-size:12px;color:var(--text-3);margin-bottom:12px">Texto mostrado ao morador quando a reserva precisa de validação do administrador (espaços com "Exigir confirmação" marcado). Deixe em branco para usar o texto padrão.</div>
+          <textarea id="cfg-msg-validacao" rows="3" placeholder="Sua reserva foi registrada e está aguardando validação da administração. Você será avisado assim que for aprovada." style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;resize:vertical"></textarea>
+        </div>
+
         <!-- ▸ Bloqueios (manutenção, feriados, etc.) -->
-        <div class="card" style="margin-bottom:18px">
+        <div class="cfg-card cfg-grp-reservas card" style="margin-bottom:18px">
           <div class="card-head">
             <div class="card-title"><div class="card-icon" style="background:rgba(224,82,82,0.14);color:var(--red)"><i class="fa-solid fa-ban"></i></div>Bloqueios de Data / Horário</div>
           </div>
@@ -3054,7 +3070,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
           <div id="cfg-bloqueios"></div>
         </div>
 
-        <div class="card">
+        <div class="cfg-card cfg-grp-sistema card" style="display:none">
           <div class="card-head">
             <div class="card-title"><div class="card-icon">🔔</div>Log de Envios Automáticos</div>
           </div>
@@ -3397,7 +3413,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
       </div>
       <div class="fg">
         <label>Data da Reserva</label>
-        <input type="date" id="mres-data">
+        <input type="date" id="mres-data" onchange="mresDataChange()">
       </div>
       <div class="fg">
         <label>Horário</label>
@@ -3531,10 +3547,10 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
       </div>
 
       <!-- Alertas / Notificações -->
-      <div class="fg full" style="grid-column:1/-1;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:4px;margin-top:8px">
+      <div id="mres-alertas-head" class="fg full" style="grid-column:1/-1;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:4px;margin-top:8px">
         <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold)"><i class="fa-solid fa-bell" style="margin-right:6px"></i>Alertas & Notificações</span>
       </div>
-      <div class="fg full" style="grid-column:1/-1">
+      <div id="mres-alertas-bloco" class="fg full" style="grid-column:1/-1">
         <div style="background:rgba(232,119,34,0.06);border:1px solid rgba(232,119,34,0.18);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:16px">
 
           <!-- Contatos -->
@@ -5945,8 +5961,16 @@ function sbFecharFlyout(){
 function renderInicio(){
   var c=(getSaasCondominios()||{})[_condAtual]||{};
   var img=$('inicio-logo-img'), fb=$('inicio-logo-fallback'), nm=$('inicio-nome');
-  if(img && c.logo){ img.src=c.logo; img.style.display=''; if(fb) fb.style.display='none'; }
-  else { if(img) img.style.display='none'; if(fb) fb.style.display=''; }
+  if(img){
+    var box = img.parentElement;
+    var src = c.logo || '', usouAdmin=false;
+    if(!src){ var lg=document.querySelector('.ap-logo-img'); if(lg){ src=lg.src; usouAdmin=true; } }
+    if(src){
+      img.src=src; img.style.display=''; if(fb) fb.style.display='none';
+      if(box){ box.style.background = usouAdmin ? 'linear-gradient(145deg,#0D1629 0%,#132040 40%,#1B2B5E 100%)' : 'var(--card)'; box.style.padding = usouAdmin ? '22px' : '0'; }
+    }
+    else { img.style.display='none'; if(fb) fb.style.display=''; if(box){ box.style.background='var(--card)'; box.style.padding='0'; } }
+  }
   if(nm) nm.textContent=c.nome||'';
 }
 
@@ -7187,6 +7211,21 @@ function atualizarHorariosEspaco(espaco, manterValor){
     sel.innerHTML=_HR_OPTS_DEFAULT.map(function(o){return '<option value="'+o.v+'">'+o.t+'</option>';}).join('');
     if(!isAdm){ [].slice.call(sel.options).forEach(function(o){ if(o.value==='personalizado') o.remove(); }); }
   }
+  // Remove horários já reservados nesse espaço/data (some da lista p/ todos)
+  var dataSel = $('mres-data') ? $('mres-data').value : '';
+  var idEdit  = $('mres-id') ? ($('mres-id').value||'') : '';
+  if(dataSel){
+    var ocupados = (G('reservas')||[]).filter(function(r){
+      if(String(r.id)===String(idEdit)) return false;              // ignora a própria reserva ao editar
+      if(r.espaco!==espaco || r.data!==dataSel) return false;
+      return r.status!=='cancelada' && r.status!=='concluida';
+    });
+    var _min=function(h){ var p=(h||'').split(/[-–]/)[0].trim().split(':'); return (+p[0]||0)*60+(+p[1]||0); };
+    var _fim=function(h){ var p=(h||'').split(/[-–]/); if(p.length<2) return _min(h)+60; var q=p[1].trim().split(':'); return (+q[0]||0)*60+(+q[1]||0); };
+    var conflita=function(slot){ var si=_min(slot), sf=_fim(slot);
+      return ocupados.some(function(o){ var oi=_min(o.horario), of=_fim(o.horario); return si<of && sf>oi; }); };
+    [].slice.call(sel.options).forEach(function(o){ if(o.value!=='personalizado' && conflita(o.value)) o.remove(); });
+  }
   var tem=[].some.call(sel.options,function(o){return o.value===atual;});
   if(atual && tem){ sel.value=atual; }
   else if(atual && isAdm){ sel.value='personalizado'; if($('mres-hr-custom')) $('mres-hr-custom').value=atual; }
@@ -7195,10 +7234,53 @@ function atualizarHorariosEspaco(espaco, manterValor){
   if(wrap) wrap.style.display = sel.value==='personalizado' ? '' : 'none';
 }
 
+// Popula o seletor de espaços. Morador: só espaços ativos. Admin: todos (desativados marcados).
+function mresPopularEspacos(incluirEspaco){
+  var sel=$('mres-espaco'); if(!sel) return;
+  var cfg=getCfgRes();
+  var nivel=window._userNivel||'morador';
+  var isAdm=(nivel==='admin'||nivel==='gestor');
+  var lista=(typeof ESPACOS_CFG!=='undefined')?ESPACOS_CFG:[].map.call(sel.options,function(o){return o.value;});
+  var html='';
+  lista.forEach(function(esp){
+    var ativo=(cfg['disp_'+_chvEsp(esp)+'_ativo']===false)?false:true;
+    if(!ativo && !isAdm && esp!==incluirEspaco) return; // morador não vê espaço desativado
+    var rotulo=esp+((!ativo&&isAdm)?' (desativado)':'');
+    html+='<option value="'+esp+'">'+rotulo+'</option>';
+  });
+  sel.innerHTML=html;
+}
+
+// Limita o calendário aos dias liberados do espaço (antecedência mín/máx). Admin fica livre.
+function mresAplicarLimitesData(){
+  var inp=$('mres-data'); if(!inp) return;
+  var nivel=window._userNivel||'morador';
+  var isAdm=(nivel==='admin'||nivel==='gestor');
+  if(isAdm){ inp.removeAttribute('min'); inp.removeAttribute('max'); return; }
+  var cfg=getCfgRes(); var chv=_chvEsp(($('mres-espaco')?$('mres-espaco').value:'')||'');
+  var antmin=parseInt(cfg['disp_'+chv+'_antmin'],10); if(isNaN(antmin)||antmin<0) antmin=0;
+  var antec =parseInt(cfg['disp_'+chv+'_antec'],10);
+  var hoje=new Date(); hoje.setHours(0,0,0,0);
+  var dMin=new Date(hoje); dMin.setDate(dMin.getDate()+antmin);
+  var iso=function(d){ return d.toISOString().slice(0,10); };
+  inp.min=iso(dMin);
+  if(!isNaN(antec)&&antec>0){ var dMax=new Date(hoje); dMax.setDate(dMax.getDate()+antec); inp.max=iso(dMax); }
+  else inp.removeAttribute('max');
+  // Se a data atual ficou fora do intervalo liberado, ajusta para o primeiro dia liberado
+  if(inp.value && inp.value < inp.min) inp.value=inp.min;
+  if(inp.max && inp.value && inp.value > inp.max) inp.value=inp.max;
+}
+
+// Ao trocar a data: reaplica limites e re-filtra horários já ocupados
+function mresDataChange(){
+  atualizarHorariosEspaco($('mres-espaco')?$('mres-espaco').value:'', undefined);
+}
+
 // Atualiza blocos financeiro e termo ao trocar espaço
 function onEspacoChange(reservaExistente){
   const espaco = $('mres-espaco').value;
   atualizarHorariosEspaco(espaco, reservaExistente ? reservaExistente.horario : undefined);
+  if(typeof mresAplicarLimitesData==='function') mresAplicarLimitesData();
   const cfg    = JSON.parse(localStorage.getItem('apvc_cfg_reservas')||'{}');
   const nivel  = window._userNivel||'morador';
   const isAdmin= nivel==='admin'||nivel==='gestor';
@@ -7272,6 +7354,18 @@ function onEspacoChange(reservaExistente){
   // Esconde admin-only checklist para moradores
   if($('mres-chk-admin')) $('mres-chk-admin').style.display = isAdmin ? 'grid' : 'none';
   if($('mres-status')) $('mres-status').closest('.fg').style.display = isAdmin ? '' : 'none';
+
+  // Financeiro: morador NÃO edita valores nem status de pagamento (definido pelo admin)
+  //  - Taxa e Caução: apenas leitura (valor vem da configuração)
+  //  - Forma/Status/Data de pagamento e Comprovante: só admin
+  const soAdminPgto = ['mres-forma-pgto','mres-pgto','mres-data-pgto','mres-comprovante'];
+  soAdminPgto.forEach(function(cid){ var el=$(cid); if(el&&el.closest('.fg')) el.closest('.fg').style.display = isAdmin ? '' : 'none'; });
+  ['mres-taxa-val','mres-caucao-val'].forEach(function(cid){
+    var el=$(cid); if(!el) return;
+    el.readOnly = !isAdmin;
+    el.style.opacity = isAdmin ? '1' : '0.75';
+    el.style.cursor  = isAdmin ? 'text' : 'default';
+  });
 }
 
 // helper para setar valor em select
@@ -7313,7 +7407,8 @@ function abrirModalRes(id){
   }
 
   $('mres-pessoas').value=r?.pessoas||'';
-  $('mres-espaco').value=r?.espaco||'Quadra de Areia';
+  mresPopularEspacos(r?.espaco||'');
+  $('mres-espaco').value=r?.espaco||$('mres-espaco').options[0]?.value||'Quadra de Areia';
   if($('mres-status')) $('mres-status').value=r?.status||'pendente';
   $('mres-data').value=r?.data||new Date().toISOString().slice(0,10);
 
@@ -7341,14 +7436,14 @@ function abrirModalRes(id){
   if($('mres-alerta-email'))    $('mres-alerta-email').value=r?.alertaEmail||'';
   carregarAlertas(r?.alertas||[]);
 
-  // Campos visíveis apenas para admin/gestor
-  const adminOnly = ['mres-alerta-whatsapp','mres-alerta-email'];
-  document.querySelectorAll('#mres-alertas-rapidos, #mres-alertas-horarios, #mres-alertas-horarios-empty').forEach(el=>{
-    el.closest && el.parentElement ? el.parentElement.style.display = isMorador ? 'none' : '' : null;
-  });
+  // Alertas & Notificações: seção inteira só para admin/gestor
+  if($('mres-alertas-head'))  $('mres-alertas-head').style.display  = isMorador ? 'none' : '';
+  if($('mres-alertas-bloco')) $('mres-alertas-bloco').style.display = isMorador ? 'none' : '';
 
   // Atualiza blocos financeiro + termo por espaço (passa reserva para pré-preencher campos)
   onEspacoChange(r||null);
+  // Limita o calendário aos dias liberados (antecedência mín/máx do espaço)
+  mresAplicarLimitesData();
 
   // Para moradores: nome e lote são identificadores vindos do cadastro — bloqueados.
   // Telefone pode ser editado livremente.
@@ -7451,9 +7546,18 @@ function salvarRes(){
     comprovante= $('mres-comprovante')? $('mres-comprovante').value.trim(): '';
   }
 
-  // Status: moradores sempre criam como 'pendente'
+  // Status:
+  //  - admin/gestor: usa o valor escolhido no formulário
+  //  - morador: se o espaço exigir confirmação do admin -> 'pendente'; senão já entra 'confirmada'
   const nivel2 = window._userNivel||'morador';
-  const statusVal = (nivel2==='admin'||nivel2==='gestor') ? ($('mres-status')?$('mres-status').value:'pendente') : 'pendente';
+  let statusVal;
+  if(nivel2==='admin'||nivel2==='gestor'){
+    statusVal = $('mres-status')?$('mres-status').value:'pendente';
+  } else {
+    const _cfgRes = getCfgRes();
+    const _exige = !!_cfgRes['disp_'+_chvEsp(espacoRes)+'_confirmar'];
+    statusVal = _exige ? 'pendente' : 'confirmada';
+  }
 
   const obj={
     id:id?+id:Date.now(),
@@ -7488,7 +7592,36 @@ function salvarRes(){
   DB_CACHE['reservas']=all;
   try{ localStorage.setItem('apvc_reservas', JSON.stringify(all)); }catch(_){}
   _reservaUpsertSB(obj);
-  closeModal('m-res'); renderReservas(); verificarAlertas(); toast('✓ Reserva salva com sucesso.');
+  closeModal('m-res'); renderReservas(); verificarAlertas();
+  // Mensagem ao morador: se a reserva ficou pendente (espaço exige validação), avisa que a administração vai validar
+  const _isMoradorMsg = !(nivel2==='admin'||nivel2==='gestor');
+  if(_isMoradorMsg && statusVal==='pendente'){
+    const _cfgMsg = getCfgRes();
+    const _msg = (_cfgMsg.msg_validacao||'').trim() ||
+      'Sua reserva foi registrada e está aguardando validação da administração. Você será avisado assim que for aprovada.';
+    if(typeof mostrarAvisoReserva==='function') mostrarAvisoReserva(_msg);
+    else { toast('✓ Reserva registrada — aguardando validação.'); alert(_msg); }
+  } else {
+    toast('✓ Reserva salva com sucesso.');
+  }
+}
+
+// Aviso pós-reserva (modal simples reutilizando estilos existentes)
+function mostrarAvisoReserva(msg){
+  var ov=$('m-aviso-reserva');
+  if(!ov){
+    ov=document.createElement('div'); ov.id='m-aviso-reserva'; ov.className='modal-ov';
+    ov.innerHTML='<div class="modal" style="max-width:440px;text-align:center;padding:34px 28px">'+
+      '<div style="width:64px;height:64px;margin:0 auto 18px;border-radius:50%;background:rgba(232,119,34,0.14);display:flex;align-items:center;justify-content:center">'+
+      '<i class="fa-regular fa-clock" style="font-size:30px;color:var(--gold)"></i></div>'+
+      '<div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:10px">Reserva registrada!</div>'+
+      '<div id="m-aviso-reserva-txt" style="font-size:14px;color:var(--text-2);line-height:1.55;margin-bottom:22px"></div>'+
+      '<button class="btn btn-gold" style="width:100%;justify-content:center" onclick="closeModal(\'m-aviso-reserva\')">Entendi</button>'+
+      '</div>';
+    document.body.appendChild(ov);
+  }
+  var t=$('m-aviso-reserva-txt'); if(t) t.textContent=msg;
+  ov.classList.add('open');
 }
 
 function excluirRes(id){
@@ -8381,11 +8514,23 @@ const ESPACOS_CFG = [
 // Espaços com financeiro habilitado por padrão (não aparecem no painel de habilitação)
 const ESPACOS_FIN_PADRAO = ['Salão de Festa','Cozinha / Espaço Lazer','Campo de Futebol'];
 
+function cfgSetTab(t){
+  document.querySelectorAll('.cfg-grp-reservas').forEach(function(e){ e.style.display = t==='reservas' ? '' : 'none'; });
+  document.querySelectorAll('.cfg-grp-sistema').forEach(function(e){ e.style.display = t==='sistema' ? '' : 'none'; });
+  var r=$('cfgtab-reservas'), s=$('cfgtab-sistema');
+  if(r) r.classList.toggle('active', t==='reservas');
+  if(s) s.classList.toggle('active', t==='sistema');
+}
+
 function renderCfgReservas(){
+  if(!$('cfgtab-reservas')||!$('cfgtab-reservas').classList.contains('active')) cfgSetTab('reservas');
   const elTermos = $('cfg-reservas-espacos');
   const elFin    = $('cfg-fin-espacos');
   if(!elTermos && !elFin) return;
   const cfgRes = JSON.parse(localStorage.getItem('apvc_cfg_reservas')||'{}');
+
+  // Mensagem pós-reserva
+  if($('cfg-msg-validacao')) $('cfg-msg-validacao').value = cfgRes.msg_validacao||'';
 
   // Termos por espaço
   if(elTermos){
@@ -8477,12 +8622,18 @@ function renderCfgDisponibilidade(){
     var antec=cfg['disp_'+chv+'_antec']||'';
     var antmin=cfg['disp_'+chv+'_antmin']||'';
     var slots=(cfg['disp_'+chv+'_slots']||'').replace(/"/g,'&quot;');
+    var confirmar=cfg['disp_'+chv+'_confirmar']?true:false;
+    var ativo=(cfg['disp_'+chv+'_ativo']===false)?false:true; // padrão: ativo
     var chips=_DIAS_SEM.map(function(d,i){
       var on=dias.indexOf(i)>=0;
       return '<label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:3px 8px;border-radius:6px;border:1px solid '+(on?'rgba(232,119,34,0.4)':'var(--border)')+';background:'+(on?'rgba(232,119,34,0.12)':'var(--ink-2)')+';color:'+(on?'var(--gold)':'var(--text-3)')+'"><input type="checkbox" data-disp-dia="'+chv+'" value="'+i+'" '+(on?'checked':'')+' style="accent-color:var(--gold)">'+d+'</label>';
     }).join('');
-    return '<div style="background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">'+
-      '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">'+esp+'</div>'+
+    return '<div data-disp-card="'+chv+'" style="background:var(--ink-2);border:1px solid '+(ativo?'var(--border)':'rgba(224,82,82,0.4)')+';border-radius:10px;padding:12px 14px;opacity:'+(ativo?'1':'0.6')+'">'+
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
+      '<span style="font-size:13px;font-weight:700;color:var(--text)">'+esp+'</span>'+
+      (ativo?'':'<span style="font-size:10px;font-weight:700;color:var(--red);background:rgba(224,82,82,0.12);border:1px solid rgba(224,82,82,0.3);border-radius:6px;padding:2px 7px">DESATIVADO</span>')+
+      '<label style="margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);cursor:pointer"><input type="checkbox" data-disp-ativo="'+chv+'" '+(ativo?'checked':'')+' onchange="renderCfgDisponibilidade&&this.closest(\'[data-disp-card]\')&&(this.closest(\'[data-disp-card]\').style.opacity=this.checked?1:0.6)" style="width:34px;height:18px;accent-color:var(--gold);cursor:pointer">Espaço ativo (aparece para o morador)</label>'+
+      '</div>'+
       '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">'+chips+
       '<span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)">Máx. horas/morador/dia:'+
       '<input type="number" min="0" step="0.5" data-disp-maxh="'+chv+'" value="'+maxh+'" placeholder="0" style="width:70px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px"></span>'+
@@ -8494,6 +8645,9 @@ function renderCfgDisponibilidade(){
       '<input type="number" min="0" step="1" data-disp-antmin="'+chv+'" value="'+antmin+'" placeholder="0" title="Reserva só a partir de N dias à frente (ex: 7 = salão precisa de preparo). 0 = sem exigência" style="width:70px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px"></span>'+
       '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);flex:1;min-width:260px">Horários permitidos:'+
       '<input type="text" data-disp-slots="'+chv+'" value="'+slots+'" placeholder="Ex: 07:00–08:00, 08:00–09:00 (vazio = padrão)" title="Somente estes horários aparecem para o morador. Separe por vírgula." style="flex:1;min-width:180px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12px"></span>'+
+      '</div>'+
+      '<div style="margin-top:10px">'+
+      '<label style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-2);cursor:pointer"><input type="checkbox" data-disp-confirmar="'+chv+'" '+(confirmar?'checked':'')+' style="width:16px;height:16px;accent-color:var(--gold)" title="Se marcado, a reserva do morador fica PENDENTE até o administrador confirmar. Se desmarcado, a reserva já fica CONFIRMADA automaticamente.">Exigir confirmação do administrador (reserva fica <b>pendente</b> até aprovar)</label>'+
       '</div></div>';
   }).join('');
 }
@@ -8608,6 +8762,9 @@ function salvarCfgReservas(){
   const elFin    = $('cfg-fin-espacos');
   const cfgRes = JSON.parse(localStorage.getItem('apvc_cfg_reservas')||'{}');
 
+  // Mensagem pós-reserva (validação)
+  if($('cfg-msg-validacao')) cfgRes.msg_validacao = $('cfg-msg-validacao').value.trim();
+
   // Salva termos
   if(elTermos){
     elTermos.querySelectorAll('input[data-chave]').forEach(inp=>{
@@ -8640,6 +8797,12 @@ function salvarCfgReservas(){
   });
   document.querySelectorAll('#cfg-disp-espacos [data-disp-slots]').forEach(function(inp){
     cfgRes['disp_'+inp.dataset.dispSlots+'_slots'] = inp.value.trim();
+  });
+  document.querySelectorAll('#cfg-disp-espacos [data-disp-confirmar]').forEach(function(cb){
+    cfgRes['disp_'+cb.dataset.dispConfirmar+'_confirmar'] = cb.checked;
+  });
+  document.querySelectorAll('#cfg-disp-espacos [data-disp-ativo]').forEach(function(cb){
+    cfgRes['disp_'+cb.dataset.dispAtivo+'_ativo'] = cb.checked;
   });
   var _diasPorChv={};
   document.querySelectorAll('#cfg-disp-espacos [data-disp-dia]').forEach(function(cb){
@@ -10458,7 +10621,7 @@ async function excluirUsuario(docId){
 </script>
 
 <!-- ===== PWA: botão de instalar + service worker ===== -->
-<button id="pwa-install-btn" onclick="pwaInstalar()" style="display:none;position:fixed;right:18px;bottom:18px;z-index:9000;
+<button id="pwa-install-btn" onclick="pwaInstalar()" style="display:none;position:fixed;left:18px;bottom:18px;z-index:9000;
   background:linear-gradient(135deg,#E87722,#B85E0F);color:#fff;border:none;border-radius:30px;
   padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 10px 30px rgba(232,119,34,0.45);
   display:none;align-items:center;gap:9px;font-family:'Segoe UI',system-ui,sans-serif">
