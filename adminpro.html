@@ -2750,6 +2750,34 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
         </div>
       </div>
 
+      <!-- ████ RELATÓRIOS DE RESERVAS ████ -->
+      <div class="panel" id="panel-relatorios">
+        <div class="ph">
+          <div><div class="ph-title"><i class="fa-solid fa-file-pdf" style="color:var(--gold);margin-right:8px"></i>Relatórios de Reservas</div><div class="ph-sub">Gere relatórios e comprovantes em PDF (imprimir ou salvar)</div></div>
+        </div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-head"><div class="card-title"><div class="card-icon" style="background:rgba(232,119,34,0.14);color:var(--gold)"><i class="fa-solid fa-filter"></i></div>Filtros do Relatório</div></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end">
+            <div class="fg" style="margin:0"><label>Espaço</label>
+              <select id="rel-espaco" style="padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;width:100%"><option value="">Todos os espaços</option></select></div>
+            <div class="fg" style="margin:0"><label>Status</label>
+              <select id="rel-status" style="padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;width:100%">
+                <option value="">Todos</option><option value="pendente">Pendente</option><option value="confirmada">Confirmada</option><option value="realizada">Realizada</option><option value="concluida">Concluída</option><option value="cancelada">Cancelada</option>
+              </select></div>
+            <div class="fg" style="margin:0"><label>De (data)</label><input type="date" id="rel-ini" style="padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;width:100%"></div>
+            <div class="fg" style="margin:0"><label>Até (data)</label><input type="date" id="rel-fim" style="padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;width:100%"></div>
+            <div class="fg" style="margin:0"><button class="btn btn-gold" style="width:100%;justify-content:center" onclick="renderRelatorios()"><i class="fa-solid fa-magnifying-glass"></i> Filtrar</button></div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-ghost" onclick="imprimirRelatorioReservas()"><i class="fa-solid fa-print"></i> Imprimir / Salvar PDF</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title"><div class="card-icon" style="background:rgba(91,156,246,0.14);color:var(--blue)"><i class="fa-solid fa-table-list"></i></div>Resultado</div><span id="rel-resumo" style="font-size:12px;color:var(--text-3)"></span></div>
+          <div id="rel-tabela" style="overflow-x:auto"></div>
+        </div>
+      </div>
+
       <!-- ████ P8: REGULAMENTOS ████ -->
       <div class="panel" id="panel-regulamento">
         <div class="ph">
@@ -2986,22 +3014,16 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
 
         <div class="cfg-card cfg-grp-sistema card" style="margin-bottom:18px;display:none">
           <div class="card-head">
-            <div class="card-title"><div class="card-icon">✉️</div>EmailJS — E-mail Automático</div>
-            <span id="cfg-ejs-status" style="font-size:12px;color:var(--text-3)">Não configurado</span>
+            <div class="card-title"><div class="card-icon">✉️</div>E-mail Automático (Supabase + Resend)</div>
+            <span id="cfg-ejs-status" style="font-size:12px;color:var(--text-3)">Via Edge Function</span>
           </div>
           <div style="background:rgba(91,156,246,0.06);border:1px solid rgba(91,156,246,0.15);border-radius:10px;padding:16px 18px;margin-bottom:16px;font-size:13px;color:var(--text-2);line-height:1.7">
-            <strong style="color:var(--blue)">Como configurar o EmailJS:</strong><br>
-            1. Acesse <a href="https://www.emailjs.com" target="_blank" style="color:var(--blue)">emailjs.com</a> e crie uma conta gratuita (200 e-mails/mês).<br>
-            2. Em <strong>Email Services</strong> → conecte seu Gmail → copie o <strong>Service ID</strong>.<br>
-            3. Em <strong>Email Templates</strong> → crie um template → copie o <strong>Template ID</strong>.<br>
-            4. Em <strong>Account</strong> → copie a <strong>Public Key</strong>.<br>
-            <br>
-            <strong>Variáveis do template:</strong> <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">{{to_email}}</code> <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">{{subject}}</code> <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">{{message}}</code>
-          </div>
-          <div class="form-grid">
-            <div class="fg"><label>Service ID</label><input type="text" id="cfg-ejs-service" placeholder="Ex: service_abc123"></div>
-            <div class="fg"><label>Template ID</label><input type="text" id="cfg-ejs-template" placeholder="Ex: template_xyz789"></div>
-            <div class="fg full"><label>Public Key</label><input type="text" id="cfg-ejs-pubkey" placeholder="Ex: user_ABCDEFGHIJKLMN"></div>
+            <strong style="color:var(--blue)">O envio de e-mail é feito pelo seu Supabase</strong> (Edge Function <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">notificar</code>) usando o <a href="https://resend.com" target="_blank" style="color:var(--blue)">Resend</a>. A chave fica <strong>segura no servidor</strong> — nada de credencial no site.<br><br>
+            <strong>Passo a passo (uma vez só):</strong><br>
+            1. Crie conta no <a href="https://resend.com" target="_blank" style="color:var(--blue)">resend.com</a> e copie a <strong>API Key</strong>.<br>
+            2. No Supabase → <strong>Edge Functions</strong> → publique a função <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">notificar</code> (código no arquivo <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">supabase/functions/notificar</code>).<br>
+            3. No Supabase → <strong>Project Settings → Edge Functions → Secrets</strong>, adicione <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">RESEND_API_KEY</code> e <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">EMAIL_FROM</code>.<br>
+            4. Teste abaixo. ✅
           </div>
           <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" onclick="testarEmailJS()">🧪 Testar E-mail</button>
@@ -3048,6 +3070,27 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
           </div>
           <div style="font-size:12px;color:var(--text-3);margin-bottom:12px">Texto mostrado ao morador quando a reserva precisa de validação do administrador (espaços com "Exigir confirmação" marcado). Deixe em branco para usar o texto padrão.</div>
           <textarea id="cfg-msg-validacao" rows="3" placeholder="Sua reserva foi registrada e está aguardando validação da administração. Você será avisado assim que for aprovada." style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none;resize:vertical"></textarea>
+        </div>
+
+        <!-- ▸ Notificações automáticas de reservas (por e-mail) -->
+        <div class="cfg-card cfg-grp-reservas card" style="margin-bottom:18px">
+          <div class="card-head">
+            <div class="card-title"><div class="card-icon" style="background:rgba(42,157,111,0.14);color:var(--green)"><i class="fa-regular fa-envelope"></i></div>Notificações automáticas por e-mail</div>
+            <button class="btn btn-gold btn-sm" onclick="salvarCfgReservas()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+          </div>
+          <div style="font-size:12px;color:var(--text-3);margin-bottom:14px">O envio usa o e-mail configurado em <strong>Integrações & Sistema</strong> (Supabase + Resend).</div>
+          <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;cursor:pointer;font-size:13px;color:var(--text-2)">
+            <input type="checkbox" id="cfg-notif-admin" style="width:18px;height:18px;margin-top:1px;accent-color:var(--gold)">
+            <span>Avisar o <b>administrador</b> quando chegar uma nova reserva pendente.</span>
+          </label>
+          <div class="fg" style="margin:0 0 16px 28px;max-width:420px"><label>E-mail(s) do administrador para aviso</label>
+            <input type="text" id="cfg-notif-admin-email" placeholder="admin@condominio.com, sindico@condominio.com" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none">
+            <span style="font-size:11px;color:var(--text-3)">Separe vários e-mails com vírgula.</span>
+          </div>
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--text-2)">
+            <input type="checkbox" id="cfg-notif-morador" style="width:18px;height:18px;margin-top:1px;accent-color:var(--gold)">
+            <span>Avisar o <b>morador</b> quando a reserva for <b>aprovada</b> ou <b>recusada</b> (usa o e-mail do cadastro dele).</span>
+          </label>
         </div>
 
         <!-- ▸ Bloqueios (manutenção, feriados, etc.) -->
@@ -3945,7 +3988,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>window.emailjs={init:function(){},send:function(){return Promise.reject(new Error('emailjs desativado'));}};</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ══════════════════════════
@@ -4755,10 +4798,10 @@ function closeSidebar(){
 }
 
 /* ══ NAVIGATION ══ */
-const panelNames={inicio:'Início',dashboard:'Dashboard',lotes:'Censo de Lotes',funcionarios:'Funcionários',financeiro:'Financeiro',manutencao:'Manutenção & Serviços',comunicados:'Comunicados',eventos:'Eventos',preventivas:'Preventivas & Corretivas',reservas:'Gestão de Reservas',regulamento:'Regulamentos',inadimplencia:'Inadimplência',usuarios:'Gestão de Usuários',configuracoes:'Configurações',procedimentos:'Procedimentos',unidades:'Cadastro de Unidades',localizacoes:'Cadastro de Localizações',condominos:'Condôminos',classificacoes:'Classificação de Condôminos',saas:'SaaS · Condomínios'};
+const panelNames={inicio:'Início',dashboard:'Dashboard',lotes:'Censo de Lotes',funcionarios:'Funcionários',financeiro:'Financeiro',manutencao:'Manutenção & Serviços',comunicados:'Comunicados',eventos:'Eventos',preventivas:'Preventivas & Corretivas',reservas:'Gestão de Reservas',regulamento:'Regulamentos',inadimplencia:'Inadimplência',usuarios:'Gestão de Usuários',configuracoes:'Configurações',procedimentos:'Procedimentos',unidades:'Cadastro de Unidades',localizacoes:'Cadastro de Localizações',condominos:'Condôminos',classificacoes:'Classificação de Condôminos',saas:'SaaS · Condomínios',relatorios:'Relatórios de Reservas'};
 const ACESSO_PAINEIS = {
-  admin:   ['inicio','saas','dashboard','lotes','unidades','localizacoes','classificacoes','condominos','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','comunicados','eventos','regulamento','usuarios','configuracoes','admfotos','procedimentos'],
-  gestor:  ['inicio','dashboard','lotes','unidades','localizacoes','classificacoes','condominos','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','comunicados','eventos','regulamento','procedimentos'],
+  admin:   ['inicio','saas','dashboard','lotes','unidades','localizacoes','classificacoes','condominos','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','relatorios','comunicados','eventos','regulamento','usuarios','configuracoes','admfotos','procedimentos'],
+  gestor:  ['inicio','dashboard','lotes','unidades','localizacoes','classificacoes','condominos','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','relatorios','comunicados','eventos','regulamento','procedimentos'],
   morador: ['inicio','reservas','comunicados','eventos','regulamento','procedimentos']
 };
 /* ══════════════════════════
@@ -5888,6 +5931,7 @@ const SB_GRUPOS = {
     {id:'comunicados',   label:'Comunicados',              icon:'fa-bullhorn',             acesso:['admin','gestor','morador']},
     {id:'eventos',       label:'Eventos',                  icon:'fa-calendar-day',         acesso:['admin','gestor','morador']},
     {id:'reservas',      label:'Reservas',                 icon:'fa-calendar-check',       acesso:['admin','gestor','morador']},
+    {id:'relatorios',    label:'Relatórios de Reservas',   icon:'fa-file-pdf',             acesso:['admin','gestor']},
     {id:'regulamento',   label:'Regulamentos',             icon:'fa-scroll',               acesso:['admin','gestor','morador']},
     {id:'procedimentos', label:'Procedimentos',            icon:'fa-clipboard-list',       acesso:['admin','gestor','morador']},
   ]},
@@ -6009,7 +6053,7 @@ function showPanel(id,el){
   try{ localStorage.setItem('apvc_last_panel', id); }catch(_){}
   sbFecharFlyout();
   closeSidebar();
-  ({dashboard:renderDashboard,lotes:renderLotes,unidades:renderUnidades,localizacoes:renderLocalizacoes,classificacoes:renderClassificacoes,condominos:renderCondominos,funcionarios:renderFTabela,financeiro:renderFin,manutencao:renderManut,comunicados:renderComun,eventos:renderEventos,preventivas:renderPreventivas,reservas:()=>{renderReservas();verificarAlertas();},regulamento:renderReg,inadimplencia:renderInadimplencia,usuarios:renderUsuarios,configuracoes:()=>{renderCfgReservas()},saas:renderSaas,inicio:renderInicio})[id]?.();
+  ({dashboard:renderDashboard,lotes:renderLotes,unidades:renderUnidades,localizacoes:renderLocalizacoes,classificacoes:renderClassificacoes,condominos:renderCondominos,funcionarios:renderFTabela,financeiro:renderFin,manutencao:renderManut,comunicados:renderComun,eventos:renderEventos,preventivas:renderPreventivas,reservas:()=>{renderReservas();verificarAlertas();},relatorios:renderRelatorios,regulamento:renderReg,inadimplencia:renderInadimplencia,usuarios:renderUsuarios,configuracoes:()=>{renderCfgReservas()},saas:renderSaas,inicio:renderInicio})[id]?.();
 }
 
 function setTab(t){
@@ -7010,7 +7054,8 @@ function renderReservas(){
 
   const its=all.filter(r=>{
     const txt=((r.nome||'')+(r.lote||'')+(r.obs||'')+(r.finalidade||'')).toLowerCase();
-    const dataOk = mostrarPassadas ? true : (r.data||'') >= hoje;
+    // Pendentes SEMPRE aparecem (mesmo se a data já passou), para o admin poder aprovar/recusar
+    const dataOk = mostrarPassadas ? true : ((r.data||'') >= hoje || r.status==='pendente');
     // Morador: identifica suas reservas pelo LOTE (principal) ou pelo e-mail (criadoPor)
     // Lote é único por morador, muito mais confiável que nome.
     const propriaOk = !isMorador || (
@@ -7180,6 +7225,7 @@ function renderReservas(){
           <button class="btn btn-sm" style="background:var(--green);color:#fff;border:none" onclick="aprovarReserva(${r.id})"><i class="fa-solid fa-check"></i> Aprovar</button>
           <button class="btn btn-sm" style="background:var(--red);color:#fff;border:none" onclick="recusarReserva(${r.id})"><i class="fa-solid fa-xmark"></i> Recusar</button>`:''}
           <button class="btn btn-ghost btn-sm" onclick="abrirModalRes(${r.id})">Editar</button>
+          ${!isMorador?`<button class="btn btn-ghost btn-sm" onclick="imprimirComprovante(${r.id})"><i class="fa-solid fa-receipt"></i> Comprovante</button>`:''}
           <button class="btn btn-red btn-sm" onclick="excluirRes(${r.id})">Excluir</button>
         </div>
       </div>
@@ -7228,6 +7274,20 @@ function _mudarStatusReserva(id, novo, msg){
   _reservaUpsertSB(all[i]);
   renderReservas(); verificarAlertas(); atualizarBadgePendentes();
   toast(msg);
+  // Notifica o morador (se ativado e houver e-mail dele)
+  const _cfgN=getCfgRes();
+  const _dest=(all[i].criadoPor||'').trim();
+  if(_cfgN.notif_morador_ativo && _dest && (novo==='confirmada'||novo==='cancelada')){
+    const _dt = all[i].data ? new Date(all[i].data+'T00:00').toLocaleDateString('pt-BR') : all[i].data;
+    const _aprovada = novo==='confirmada';
+    const _assunto = _aprovada ? 'Reserva aprovada — '+all[i].espaco : 'Reserva não aprovada — '+all[i].espaco;
+    const _corpo = (_aprovada
+        ? 'Boa notícia! Sua reserva foi APROVADA e está confirmada.'
+        : 'Informamos que sua reserva NÃO foi aprovada pela administração.')+
+      '\n\nEspaço: '+all[i].espaco+'\nData: '+_dt+'\nHorário: '+all[i].horario+'\nUnidade: '+all[i].lote;
+    enviarEmail(_dest, _assunto, _corpo)
+      .then(function(r){ addLog((r.ok?'✓':'✗')+' Aviso ao morador ('+(_aprovada?'aprovada':'recusada')+')'+(r.ok?'':': '+r.erro)); });
+  }
 }
 function aprovarReserva(id){
   _mudarStatusReserva(id,'confirmada','✓ Reserva aprovada e confirmada.');
@@ -7235,6 +7295,124 @@ function aprovarReserva(id){
 function recusarReserva(id){
   if(!confirm('Recusar (cancelar) esta reserva?')) return;
   _mudarStatusReserva(id,'cancelada','Reserva recusada.');
+}
+
+/* ══════════════════════════
+   RELATÓRIOS DE RESERVAS (PDF)
+══════════════════════════ */
+const _REL_STATUS_LABEL={pendente:'Pendente',confirmada:'Confirmada',cancelada:'Cancelada',realizada:'Realizada',concluida:'Concluída'};
+function _relFmtData(d){ return d?new Date(d+'T00:00').toLocaleDateString('pt-BR'):'—'; }
+function _relFmtMoeda(v){ v=parseFloat(v)||0; return v?('R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2})):'—'; }
+
+function _relFiltradas(){
+  var esp=$('rel-espaco')?$('rel-espaco').value:'';
+  var st=$('rel-status')?$('rel-status').value:'';
+  var ini=$('rel-ini')?$('rel-ini').value:'';
+  var fim=$('rel-fim')?$('rel-fim').value:'';
+  var lista=(G('reservas')||[]).filter(function(r){
+    if(esp && r.espaco!==esp) return false;
+    if(st && r.status!==st) return false;
+    if(ini && (r.data||'')<ini) return false;
+    if(fim && (r.data||'')>fim) return false;
+    return true;
+  });
+  lista.sort(function(a,b){ return (a.data||'').localeCompare(b.data||'')|| (a.horario||'').localeCompare(b.horario||''); });
+  return lista;
+}
+
+function renderRelatorios(){
+  // popula seletor de espaços uma vez
+  var sel=$('rel-espaco');
+  if(sel && !sel._filled && typeof ESPACOS_CFG!=='undefined'){
+    sel.innerHTML='<option value="">Todos os espaços</option>'+ESPACOS_CFG.map(function(e){return '<option>'+e+'</option>';}).join('');
+    sel._filled=true;
+  }
+  var lista=_relFiltradas();
+  var totalTaxa=lista.reduce(function(s,r){return s+(parseFloat(r.taxa)||0);},0);
+  var totalPago=lista.reduce(function(s,r){return s+(r.pgto==='pago'?(parseFloat(r.taxa)||0):0);},0);
+  if($('rel-resumo')) $('rel-resumo').textContent=lista.length+' reserva(s) · Taxas: '+_relFmtMoeda(totalTaxa)+' · Pagas: '+_relFmtMoeda(totalPago);
+  var el=$('rel-tabela'); if(!el) return;
+  if(!lista.length){ el.innerHTML='<div style="padding:28px;text-align:center;color:var(--text-2)">Nenhuma reserva no filtro selecionado.</div>'; return; }
+  el.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px">'+
+    '<thead><tr style="text-align:left;color:var(--text-3);text-transform:uppercase;font-size:11px;letter-spacing:0.5px">'+
+    '<th style="padding:8px">Data</th><th style="padding:8px">Horário</th><th style="padding:8px">Espaço</th><th style="padding:8px">Morador</th><th style="padding:8px">Unid.</th><th style="padding:8px">Status</th><th style="padding:8px">Taxa</th><th style="padding:8px">Pgto</th><th style="padding:8px"></th></tr></thead><tbody>'+
+    lista.map(function(r){
+      return '<tr style="border-top:1px solid var(--border)">'+
+        '<td style="padding:8px;color:var(--gold);font-weight:600">'+_relFmtData(r.data)+'</td>'+
+        '<td style="padding:8px">'+(r.horario||'—')+'</td>'+
+        '<td style="padding:8px">'+(r.espaco||'—')+'</td>'+
+        '<td style="padding:8px">'+(r.nome||'—')+'</td>'+
+        '<td style="padding:8px">'+(r.lote||'—')+'</td>'+
+        '<td style="padding:8px">'+(_REL_STATUS_LABEL[r.status]||r.status||'—')+'</td>'+
+        '<td style="padding:8px">'+_relFmtMoeda(r.taxa)+'</td>'+
+        '<td style="padding:8px">'+(r.pgto==='pago'?'Pago':r.pgto==='isento'?'Isento':'Pendente')+'</td>'+
+        '<td style="padding:8px;text-align:right"><button class="btn btn-ghost btn-sm" onclick="imprimirComprovante('+r.id+')" title="Comprovante"><i class="fa-solid fa-receipt"></i></button></td>'+
+        '</tr>';
+    }).join('')+'</tbody></table>';
+}
+
+function _abrirImpressao(titulo, corpoHtml){
+  var cond=((typeof getSaasCondominios==='function'?getSaasCondominios():{})||{})[_condAtual]||{};
+  var logo=cond.logo||'';
+  var nomeCond=cond.nome||'Condomínio';
+  var w=window.open('','_blank','width=920,height=720');
+  if(!w){ toast('⚠️ Permita pop-ups (janelas) para gerar o PDF.'); return; }
+  var css='*{box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif}body{margin:32px;color:#1a2233}'+
+    '.cab{display:flex;align-items:center;gap:16px;border-bottom:3px solid #E87722;padding-bottom:14px;margin-bottom:20px}'+
+    '.cab img{width:64px;height:64px;object-fit:contain;border-radius:8px}'+
+    '.cab h1{font-size:20px;margin:0;color:#132040}.cab .sub{font-size:13px;color:#666;margin-top:2px}'+
+    'table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}'+
+    'th{background:#132040;color:#fff;text-align:left;padding:8px 10px;font-size:11px;text-transform:uppercase}'+
+    'td{padding:7px 10px;border-bottom:1px solid #e2e6ee}'+
+    'tr:nth-child(even) td{background:#f7f8fb}'+
+    '.tot{margin-top:16px;font-size:13px;font-weight:700;color:#132040}'+
+    '.rod{margin-top:28px;padding-top:12px;border-top:1px solid #ddd;font-size:11px;color:#999;text-align:center}'+
+    '.rc{max-width:520px;border:1px solid #e2e6ee;border-radius:12px;padding:22px 26px}'+
+    '.rc .lin{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed #e2e6ee;font-size:13px}'+
+    '.rc .lin b{color:#132040}.rc .tit{font-size:16px;font-weight:800;color:#E87722;margin-bottom:6px}'+
+    '.assin{margin-top:60px;display:flex;justify-content:space-around;text-align:center;font-size:12px;color:#555}'+
+    '.assin .l{border-top:1px solid #333;width:200px;padding-top:6px}'+
+    '@media print{body{margin:14mm}button{display:none}}';
+  var cab='<div class="cab">'+(logo?'<img src="'+logo+'">':'')+'<div><h1>'+nomeCond+'</h1><div class="sub">'+titulo+'</div></div></div>';
+  var rod='<div class="rod">Gerado em '+new Date().toLocaleString('pt-BR')+' · AdminPro — Gestão de Reservas</div>';
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+titulo+'</title><style>'+css+'</style></head><body>'+cab+corpoHtml+rod+'<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},350);};</scr'+'ipt></body></html>');
+  w.document.close();
+}
+
+function imprimirRelatorioReservas(){
+  var lista=_relFiltradas();
+  if(!lista.length){ toast('Nenhuma reserva no filtro para imprimir.'); return; }
+  var totalTaxa=lista.reduce(function(s,r){return s+(parseFloat(r.taxa)||0);},0);
+  var totalPago=lista.reduce(function(s,r){return s+(r.pgto==='pago'?(parseFloat(r.taxa)||0):0);},0);
+  var linhas=lista.map(function(r){
+    return '<tr><td>'+_relFmtData(r.data)+'</td><td>'+(r.horario||'—')+'</td><td>'+(r.espaco||'—')+'</td><td>'+(r.nome||'—')+'</td><td>'+(r.lote||'—')+'</td><td>'+(_REL_STATUS_LABEL[r.status]||r.status||'—')+'</td><td>'+_relFmtMoeda(r.taxa)+'</td><td>'+(r.pgto==='pago'?'Pago':r.pgto==='isento'?'Isento':'Pendente')+'</td></tr>';
+  }).join('');
+  var corpo='<table><thead><tr><th>Data</th><th>Horário</th><th>Espaço</th><th>Morador</th><th>Unid.</th><th>Status</th><th>Taxa</th><th>Pgto</th></tr></thead><tbody>'+linhas+'</tbody></table>'+
+    '<div class="tot">Total de reservas: '+lista.length+' &nbsp;·&nbsp; Taxas: '+_relFmtMoeda(totalTaxa)+' &nbsp;·&nbsp; Pagas: '+_relFmtMoeda(totalPago)+'</div>';
+  _abrirImpressao('Relatório de Reservas', corpo);
+}
+
+function imprimirComprovante(id){
+  var r=(G('reservas')||[]).find(function(x){return x.id===id;});
+  if(!r){ toast('Reserva não encontrada.'); return; }
+  function lin(rot,val){ return '<div class="lin"><span>'+rot+'</span><b>'+(val||'—')+'</b></div>'; }
+  var corpo='<div class="rc">'+
+    '<div class="tit">Comprovante de Reserva</div>'+
+    '<div style="font-size:12px;color:#888;margin-bottom:12px">Nº '+r.id+'</div>'+
+    lin('Espaço', r.espaco)+
+    lin('Data', _relFmtData(r.data))+
+    lin('Horário', r.horario)+
+    lin('Morador', r.nome)+
+    lin('Unidade', r.lote)+
+    lin('Telefone', r.tel)+
+    lin('Finalidade', r.finalidade)+
+    lin('Status', _REL_STATUS_LABEL[r.status]||r.status)+
+    lin('Taxa', _relFmtMoeda(r.taxa))+
+    lin('Caução', _relFmtMoeda(r.caucao))+
+    lin('Pagamento', r.pgto==='pago'?'Pago':r.pgto==='isento'?'Isento':'Pendente')+
+    '<div class="assin"><div class="l">Morador</div><div class="l">Administração</div></div>'+
+    '</div>';
+  _abrirImpressao('Comprovante de Reserva Nº '+r.id, corpo);
 }
 
 function fecharModal(modalId, saveFn, checkFieldId){
@@ -7660,6 +7838,15 @@ function salvarRes(){
       'Sua reserva foi registrada e está aguardando validação da administração. Você será avisado assim que for aprovada.';
     if(typeof mostrarAvisoReserva==='function') mostrarAvisoReserva(_msg);
     else { toast('✓ Reserva registrada — aguardando validação.'); alert(_msg); }
+    // Notifica o administrador (se ativado)
+    if(_cfgMsg.notif_admin_ativo && (_cfgMsg.notif_admin_email||'').trim()){
+      const _dt = obj.data ? new Date(obj.data+'T00:00').toLocaleDateString('pt-BR') : obj.data;
+      const _corpo = 'Nova reserva PENDENTE aguardando sua aprovação:\n\n'+
+        'Espaço: '+obj.espaco+'\nData: '+_dt+'\nHorário: '+obj.horario+'\n'+
+        'Morador: '+obj.nome+'\nUnidade: '+obj.lote+'\n\nAcesse o portal para aprovar ou recusar.';
+      enviarEmail(_cfgMsg.notif_admin_email.trim(), 'Nova reserva pendente — '+obj.espaco, _corpo)
+        .then(function(r){ addLog((r.ok?'✓':'✗')+' Aviso ao admin de nova reserva pendente'+(r.ok?'':': '+r.erro)); });
+    }
   } else {
     toast('✓ Reserva salva com sucesso.');
   }
@@ -8379,23 +8566,24 @@ async function enviarWhatsApp(numero, mensagem){
   }
 }
 
-/* ── Enviar E-mail via EmailJS ── */
+/* ── Enviar E-mail via Supabase Edge Function (Resend) ──
+   A Edge Function "notificar" roda no servidor do Supabase e usa o Resend.
+   A chave do Resend fica como SECRET no Supabase — nunca no site. */
+// Slug da Edge Function no Supabase (ver URL em Edge Functions).
+// Se você recriar a função com o nome "notificar", troque aqui para 'notificar'.
+const FN_NOTIFICAR = 'dynamic-handler';
 async function enviarEmail(destino, assunto, mensagem){
   if(!destino) return {ok:false, erro:'E-mail destino não informado'};
-  // Usa as credenciais hardcoded diretamente — sem depender de localStorage
-  var EJS_SERVICE  = 'service_jfvgxm9';
-  var EJS_TEMPLATE = 'template_3scx0ho';
-  var EJS_PUBKEY   = 'sRXYjZj8VuTVZn9Hh';
+  if(!SB || !SB.functions) return {ok:false, erro:'Supabase indisponível'};
   try{
-    emailjs.init(EJS_PUBKEY);
-    const resp = await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, {
-      to_email: destino,
-      subject:  assunto,
-      message:  mensagem,
+    const { data, error } = await SB.functions.invoke(FN_NOTIFICAR, {
+      body: { to: destino, subject: assunto, message: mensagem }
     });
+    if(error) return {ok:false, erro: (error.message||JSON.stringify(error))};
+    if(data && data.error) return {ok:false, erro: data.error};
     return {ok:true};
   } catch(e){
-    return {ok:false, erro: e?.text || e?.message || JSON.stringify(e)};
+    return {ok:false, erro: e?.message || JSON.stringify(e)};
   }
 }
 
@@ -8460,15 +8648,15 @@ async function testarEmailJS(){
   const cfg = getCfg();
   localStorage.setItem('apvc_cfg', JSON.stringify(cfg));
   try{ emailjs.init(cfg.ejsPubkey); } catch(e){}
-  const r=await enviarEmail(dest,'🧪 Teste AdminPro — EmailJS','Este é um e-mail de teste do Portal de Gestão. Se recebeu, a integração está funcionando corretamente! — AdminPro');
+  const r=await enviarEmail(dest,'Teste AdminPro — E-mail (Supabase + Resend)','Este e um e-mail de teste do Portal de Gestao. Se recebeu, a integracao esta funcionando corretamente! — AdminPro');
   if(r.ok){
     el.textContent='✓ E-mail enviado! Verifique a caixa de entrada.';el.style.color='var(--blue)';
-    addLog('✓ EmailJS — E-mail de teste enviado para '+dest);
+    addLog('✓ E-mail de teste enviado para '+dest);
   } else {
     el.textContent='✗ Erro: '+r.erro;el.style.color='var(--red)';
-    addLog('✗ EmailJS — Erro no teste: '+r.erro);
-    if((r.erro||'').includes('configurado')){
-      el.textContent='✗ Clique em Salvar Configurações e tente novamente.';
+    addLog('✗ E-mail — Erro no teste: '+r.erro);
+    if((r.erro||'').toLowerCase().includes('function')){
+      el.textContent='✗ Publique a Edge Function "notificar" e configure o RESEND_API_KEY no Supabase.';
     }
   }
 }
@@ -8590,6 +8778,10 @@ function renderCfgReservas(){
 
   // Mensagem pós-reserva
   if($('cfg-msg-validacao')) $('cfg-msg-validacao').value = cfgRes.msg_validacao||'';
+  // Notificações automáticas
+  if($('cfg-notif-admin'))       $('cfg-notif-admin').checked       = !!cfgRes.notif_admin_ativo;
+  if($('cfg-notif-admin-email')) $('cfg-notif-admin-email').value   = cfgRes.notif_admin_email||'';
+  if($('cfg-notif-morador'))     $('cfg-notif-morador').checked     = !!cfgRes.notif_morador_ativo;
 
   // Termos por espaço
   if(elTermos){
@@ -8823,6 +9015,10 @@ function salvarCfgReservas(){
 
   // Mensagem pós-reserva (validação)
   if($('cfg-msg-validacao')) cfgRes.msg_validacao = $('cfg-msg-validacao').value.trim();
+  // Notificações automáticas
+  if($('cfg-notif-admin'))       cfgRes.notif_admin_ativo   = $('cfg-notif-admin').checked;
+  if($('cfg-notif-admin-email')) cfgRes.notif_admin_email   = $('cfg-notif-admin-email').value.trim();
+  if($('cfg-notif-morador'))     cfgRes.notif_morador_ativo = $('cfg-notif-morador').checked;
 
   // Salva termos
   if(elTermos){
@@ -10680,26 +10876,31 @@ async function excluirUsuario(docId){
 </script>
 
 <!-- ===== PWA: botão de instalar + service worker ===== -->
-<button id="pwa-install-btn" onclick="pwaInstalar()" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:9000;
-  background:linear-gradient(135deg,#E87722,#B85E0F);color:#fff;border:none;border-radius:30px;
-  padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 10px 30px rgba(232,119,34,0.45);
-  display:none;align-items:center;gap:9px;font-family:'Segoe UI',system-ui,sans-serif">
-  <i class="fa-solid fa-circle-down"></i> Instalar app
-</button>
+<div id="pwa-install-wrap" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:12px;z-index:450;align-items:center;gap:6px;font-family:'Segoe UI',system-ui,sans-serif">
+  <button id="pwa-install-btn" onclick="pwaInstalar()" style="background:linear-gradient(135deg,#E87722,#B85E0F);color:#fff;border:none;border-radius:30px;
+    padding:10px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(232,119,34,0.4);
+    display:inline-flex;align-items:center;gap:8px">
+    <i class="fa-solid fa-circle-down"></i> Instalar app
+  </button>
+  <button onclick="pwaDispensar()" title="Dispensar" style="background:rgba(0,0,0,0.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;line-height:1;box-shadow:0 4px 12px rgba(0,0,0,0.3)">&times;</button>
+</div>
 <script>
 (function(){
   let _deferredPrompt = null;
+
+  function _mostrarInstall(){ const w=document.getElementById('pwa-install-wrap'); if(w && localStorage.getItem('apvc_pwa_dispensado')!=='1') w.style.display='inline-flex'; }
+  function _ocultarInstall(){ const w=document.getElementById('pwa-install-wrap'); if(w) w.style.display='none'; }
+
+  window.pwaDispensar = function(){ localStorage.setItem('apvc_pwa_dispensado','1'); _ocultarInstall(); };
 
   // Captura o evento de instalação (Android / Chrome / Edge desktop)
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     _deferredPrompt = e;
-    const b = document.getElementById('pwa-install-btn');
-    if(b) b.style.display = 'inline-flex';
+    _mostrarInstall();
   });
 
   window.pwaInstalar = async function(){
-    const b = document.getElementById('pwa-install-btn');
     // iOS (Safari) não suporta beforeinstallprompt — mostra instruções
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     if(!_deferredPrompt){
@@ -10710,13 +10911,12 @@ async function excluirUsuario(docId){
     _deferredPrompt.prompt();
     try{ await _deferredPrompt.userChoice; }catch(_){}
     _deferredPrompt = null;
-    if(b) b.style.display = 'none';
+    _ocultarInstall();
   };
 
   // Esconde o botão se já estiver instalado/standalone
   window.addEventListener('appinstalled', ()=>{
-    const b = document.getElementById('pwa-install-btn');
-    if(b) b.style.display='none';
+    _ocultarInstall();
     _deferredPrompt = null;
   });
   function isStandalone(){
@@ -10733,10 +10933,7 @@ async function excluirUsuario(docId){
   // iOS: mostra o botão (instruções) quando ainda não está instalado
   document.addEventListener('DOMContentLoaded', ()=>{
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    if(isIOS && !isStandalone()){
-      const b = document.getElementById('pwa-install-btn');
-      if(b) b.style.display='inline-flex';
-    }
+    if(isIOS && !isStandalone()){ _mostrarInstall(); }
   });
 })();
 </script>
