@@ -4754,8 +4754,9 @@ async function _aplicarSessao(session){
   if(_isSuper){
     try{ var _vis=localStorage.getItem('apvc_cond_view'); if(_vis) _condAtual=_vis; }catch(_){}
   }
-  window._userNivel = me.nivel || 'morador';
-  localStorage.setItem('apvc_user', JSON.stringify({ nome:me.nome, email:me.email, nivel:me.nivel||'morador', lote:me.unidade||'', condominio:_condAtual, super:_isSuper }));
+  // Super-admin da plataforma sempre navega com nível admin
+  window._userNivel = _isSuper ? 'admin' : (me.nivel || 'morador');
+  localStorage.setItem('apvc_user', JSON.stringify({ nome:me.nome, email:me.email, nivel:window._userNivel, lote:me.unidade||'', condominio:_condAtual, super:_isSuper }));
   salvarExpiracao();
   try { await loadAllFromFirestore(); } catch (err) { console.error(err); }
   entrarNoPortal(me.nome || me.email);
@@ -4904,7 +4905,8 @@ function mresLoteClear(){
 
 function aplicarAcesso(nivel){
   // Normaliza: qualquer nível que não seja admin ou gestor é tratado como morador
-  const n = (nivel === 'admin' || nivel === 'gestor') ? nivel : 'morador';
+  // (exceto super-admin da plataforma, que sempre é admin)
+  const n = (nivel === 'admin' || nivel === 'gestor') ? nivel : (isSuperAdmin() ? 'admin' : 'morador');
   document.querySelectorAll('[data-acesso]').forEach(el=>{
     const permitidos = el.getAttribute('data-acesso').split(',');
     el.style.display = permitidos.includes(n) ? '' : 'none';
