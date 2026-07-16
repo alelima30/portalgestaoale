@@ -736,10 +736,7 @@ html.light .sb-flyout{background:#1A2847}
   border-radius:14px;padding:16px 18px;color:#fff;position:relative;overflow:hidden;
   box-shadow:0 8px 22px rgba(0,0,0,0.25);
 }
-.bikpi::after{ /* brilho decorativo */
-  content:'';position:absolute;right:-30px;top:-30px;width:110px;height:110px;
-  border-radius:50%;background:rgba(255,255,255,0.14);
-}
+/* círculo decorativo removido — visual mais limpo/de sistema */
 .bikpi .bk-label{font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;opacity:.92;margin-bottom:6px}
 .bikpi .bk-val{font-size:24px;font-weight:800;line-height:1.1;text-shadow:0 1px 3px rgba(0,0,0,0.18)}
 .bikpi .bk-badge{
@@ -1227,10 +1224,29 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
 }
 .ticker-sep{color:var(--text-3);font-size:18px;opacity:0.3}
 
+/* ══ Config: Disponibilidade por Espaço ══ */
+.cfg-disp-card{ background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px }
+.cfg-disp-head{ display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap }
+.cfg-disp-ativo{ margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);cursor:pointer }
+.cfg-disp-dias{ display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px }
+.cfg-disp-flds{ display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center }
+.cfg-disp-fld{ display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2) }
+.cfg-disp-fld input{ padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;outline:none }
+.cfg-disp-fld.num input{ width:76px }
+.cfg-disp-fld.slots{ flex:1;min-width:260px }
+.cfg-disp-fld.slots input{ flex:1;min-width:170px }
+.cfg-disp-check{ display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text-2);cursor:pointer;margin-top:12px;line-height:1.45 }
+
 /* ══════════════════════════════
    MOBILE RESPONSIVE
 ══════════════════════════════ */
 @media(max-width:768px){
+  .cfg-disp-ativo{ margin-left:0;width:100% }
+  .cfg-disp-flds{ flex-direction:column;align-items:stretch;gap:10px }
+  .cfg-disp-fld{ width:100%;justify-content:space-between }
+  .cfg-disp-fld.num input{ width:90px }
+  .cfg-disp-fld.slots{ flex-direction:column;align-items:stretch;gap:5px }
+  .cfg-disp-fld.slots input{ width:100% }
   :root{ --sidebar:0px }
 
   /* ── Sidebar vira drawer lateral ── */
@@ -1289,8 +1305,8 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
   /* ── Section header empilhado ── */
   .ph{ flex-direction:column; gap:12px; margin-bottom:16px }
   .ph-title{ font-size:22px }
-  .ph-actions{ width:100%; flex-wrap:wrap; gap:8px }
-  .ph-actions .btn{ flex:1; justify-content:center; min-width:120px }
+  .ph-actions{ width:100%; flex-direction:column; flex-wrap:wrap; gap:8px }
+  .ph-actions .btn{ flex:1 1 100%; width:100%; justify-content:center; white-space:normal }
   .ph-actions .month-sel{ width:100% }
   .ph-actions .month-sel select{ width:100% }
 
@@ -2687,9 +2703,29 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
         <div class="ph">
           <div><div class="ph-title">Gestão de Reservas</div><div class="ph-sub">Agendamento de espaços e áreas comuns do condomínio</div></div>
           <div class="ph-actions">
+            <button class="btn btn-ghost" id="res-btn-view" onclick="resToggleView()"><i class="fa-solid fa-calendar-days"></i> Ver calendário</button>
             <button class="btn btn-gold" onclick="abrirModalRes(null)">+ Nova Reserva</button>
           </div>
         </div>
+
+        <!-- Calendário mensal (alterna com a lista) -->
+        <div id="res-calendario" style="display:none">
+          <div class="card" style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <button class="btn btn-ghost btn-sm" onclick="resCalNav(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                <span id="res-cal-titulo" style="font-size:16px;font-weight:700;color:var(--text);min-width:150px;text-align:center"></span>
+                <button class="btn btn-ghost btn-sm" onclick="resCalNav(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="btn btn-ghost btn-sm" onclick="resCalHoje()">Hoje</button>
+              </div>
+              <select id="res-cal-espaco" onchange="renderCalendario()" style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px">
+                <option value="">Todos os espaços</option>
+              </select>
+            </div>
+            <div id="res-cal-grid"></div>
+          </div>
+        </div>
+
         <div class="kpi-grid" id="res-kpi"></div>
 
         <!-- Dashboard analítico estilo BI (admin/gestor) -->
@@ -2730,7 +2766,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
 
         <!-- Banner de Alertas de Reservas Próximas -->
         <div id="res-alertas-banner" style="display:none"></div>
-        <div class="card" style="margin-bottom:16px">
+        <div class="card" id="res-filtros-card" style="margin-bottom:16px">
           <div class="card-head" style="flex-wrap:wrap;gap:10px">
             <div class="card-title"><div class="card-icon" style="background:rgba(232,119,34,0.14);color:var(--gold)"><i class="fa-solid fa-magnifying-glass"></i></div>Pesquisa & Filtros</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -2773,7 +2809,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
         </div>
 
         <!-- Lista de Reservas -->
-        <div class="card">
+        <div class="card" id="res-lista-card">
           <div class="card-head">
             <div class="card-title"><div class="card-icon" style="background:rgba(232,119,34,0.14);color:var(--gold)"><i class="fa-solid fa-calendar-check"></i></div>Reservas</div>
             <div style="display:flex;gap:8px">
@@ -2810,6 +2846,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
           </div>
           <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
             <button class="btn btn-ghost" onclick="imprimirRelatorioReservas()"><i class="fa-solid fa-print"></i> Imprimir / Salvar PDF</button>
+            <button class="btn btn-ghost" onclick="exportarReservasCSV()"><i class="fa-solid fa-file-csv"></i> Exportar Excel / CSV</button>
           </div>
         </div>
         <div class="card">
@@ -3017,7 +3054,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
 
       <div class="panel" id="panel-configuracoes">
         <div class="ph">
-          <div><div class="ph-title">⚙️ Configurações</div><div class="ph-sub">Integração com WhatsApp (Z-API) e E-mail (EmailJS)</div></div>
+          <div><div class="ph-title">⚙️ Configurações</div><div class="ph-sub">Reservas, WhatsApp (Z-API) e E-mail (Supabase + Resend)</div></div>
           <div class="ph-actions">
             <button class="btn btn-gold" onclick="salvarConfigs()">💾 Salvar Configurações</button>
             <button id="btn-enviar-manual" class="btn btn-ghost" onclick="enviarAlertaManual()">📤 Enviar alertas pendentes agora</button>
@@ -3131,6 +3168,26 @@ tbody tr:hover td{background:rgba(255,255,255,0.025);color:var(--text)}
             <input type="checkbox" id="cfg-notif-morador" style="width:18px;height:18px;margin-top:1px;accent-color:var(--gold)">
             <span>Avisar o <b>morador</b> quando a reserva for <b>aprovada</b> ou <b>recusada</b> (usa o e-mail do cadastro dele).</span>
           </label>
+          <label style="display:flex;align-items:flex-start;gap:10px;margin-top:14px;cursor:pointer;font-size:13px;color:var(--text-2)">
+            <input type="checkbox" id="cfg-notif-lembrete" style="width:18px;height:18px;margin-top:1px;accent-color:var(--gold)">
+            <span>Enviar <b>lembrete</b> ao morador <b>1 dia antes</b> da reserva (por e-mail).</span>
+          </label>
+        </div>
+
+        <!-- ▸ Regras gerais de reserva -->
+        <div class="cfg-card cfg-grp-reservas card" style="margin-bottom:18px">
+          <div class="card-head">
+            <div class="card-title"><div class="card-icon" style="background:rgba(224,82,82,0.14);color:var(--red)"><i class="fa-solid fa-shield-halved"></i></div>Regras gerais de reserva</div>
+            <button class="btn btn-gold btn-sm" onclick="salvarCfgReservas()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+          </div>
+          <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;cursor:pointer;font-size:13px;color:var(--text-2)">
+            <input type="checkbox" id="cfg-bloq-inad" style="width:18px;height:18px;margin-top:1px;accent-color:var(--gold)">
+            <span>Bloquear reserva de <b>inadimplentes</b> (morador com lote em situação de inadimplência/acordo/judicial não consegue reservar).</span>
+          </label>
+          <div class="fg" style="margin:0;max-width:360px"><label>Máximo de reservas em aberto por morador</label>
+            <input type="number" id="cfg-max-reservas" min="0" step="1" placeholder="0 = sem limite" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink-2);color:var(--text);font-size:13px;outline:none">
+            <span style="font-size:11px;color:var(--text-3)">Conta reservas pendentes + confirmadas com data de hoje em diante. 0 = sem limite.</span>
+          </div>
         </div>
 
         <!-- ▸ Bloqueios (manutenção, feriados, etc.) -->
@@ -4290,7 +4347,7 @@ const SUPER_ADMINS = [ADMIN_EMAIL];
 
 // Módulos da plataforma → grupos do menu. Novos módulos: adicione aqui.
 const MODULOS_SAAS = {
-  paineis:        { label:'Painéis & Dashboard',                grupos:['paineis'],        extra:['dashboard'] },
+  paineis:        { label:'Painéis & Dashboard',                grupos:['paineis'] },
   administrativo: { label:'Administrativo',                     grupos:['administrativo','cadastro'] },
   operacoes:      { label:'Operações (Reservas, Comunicados…)', grupos:['operacoes'] },
   sistema:        { label:'Sistema (Usuários, Configurações)',  grupos:['sistema'] },
@@ -4385,8 +4442,7 @@ function aplicarSaas(){
     const mod=grupoModulo(hd.dataset.grupo);
     if(mod && !ativos.includes(mod)) g.style.display='none';
   });
-  const dash=document.querySelector('.nav-standalone[data-acesso]');
-  if(dash && !ativos.includes('paineis')) dash.style.display='none';
+  // Dashboard fica sempre disponível para admin/gestor (não depende do módulo Painéis)
   const saasEl=$('sb-saas'); if(saasEl) saasEl.style.display = isSuperAdmin()?'':'none';
   const tag=$('tb-tag-cond'); if(tag) tag.textContent=_condAtual;
   montarSeletorCondominio();
@@ -4918,7 +4974,7 @@ function closeSidebar(){
 /* ══ NAVIGATION ══ */
 const panelNames={inicio:'Início',dashboard:'Dashboard',lotes:'Censo de Lotes',funcionarios:'Funcionários',financeiro:'Financeiro',manutencao:'Manutenção & Serviços',comunicados:'Comunicados',eventos:'Eventos',preventivas:'Preventivas & Corretivas',reservas:'Gestão de Reservas',regulamento:'Regulamentos',inadimplencia:'Inadimplência',usuarios:'Gestão de Usuários',configuracoes:'Configurações',procedimentos:'Procedimentos',unidades:'Cadastro de Unidades',localizacoes:'Cadastro de Localizações',condominos:'Condôminos',classificacoes:'Classificação de Condôminos',saas:'SaaS · Condomínios',relatorios:'Relatórios de Reservas',encomendas:'Encomendas'};
 const ACESSO_PAINEIS = {
-  admin:   ['inicio','saas','dashboard','lotes','unidades','localizacoes','classificacoes','condominos','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','relatorios','comunicados','eventos','encomendas','regulamento','usuarios','configuracoes','admfotos','procedimentos'],
+  admin:   ['inicio','saas','dashboard','lotes','unidades','localizacoes','classificacoes','condominos','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','relatorios','comunicados','eventos','encomendas','regulamento','usuarios','configuracoes','procedimentos'],
   gestor:  ['inicio','dashboard','lotes','unidades','localizacoes','classificacoes','condominos','funcionarios','financeiro','inadimplencia','manutencao','preventivas','reservas','relatorios','comunicados','eventos','encomendas','regulamento','procedimentos'],
   morador: ['inicio','reservas','comunicados','eventos','encomendas','regulamento','procedimentos']
 };
@@ -6057,7 +6113,7 @@ const SB_GRUPOS = {
   sistema:  { titulo:'Sistema', itens:[
     {id:'usuarios',      label:'Usu\u00e1rios',                 icon:'fa-users-gear',           acesso:['admin']},
     {id:'configuracoes', label:'Configura\u00e7\u00f5es',            icon:'fa-gear',                 acesso:['admin']},
-    {id:'admfotos',      label:'Adm. Fotos',               icon:'fa-images',               acesso:['admin']},
+    /* Adm. Fotos oculto a pedido (o painel continua existindo, s\u00f3 n\u00e3o aparece no menu) */
   ]},
 };
 let _sbGrupoRaiz   = null;
@@ -6070,9 +6126,27 @@ function _sbItemHtml(it){
       `<div class="nav-icon"><i class="fa-solid ${it.icon}"></i></div>${it.label}`+
       `<span class="sb-nav-arrow">&#8250;</span></div>`;
   }
+  let extra = '';
+  if(it.id==='reservas'){
+    const n = _pendentesCount();
+    if(n>0) extra = `<span class="sb-item-badge" style="margin-left:auto;background:var(--amber);color:#3a2a06;font-size:11px;font-weight:800;border-radius:99px;padding:1px 8px;line-height:1.6">${n}</span>`;
+  }
   return `<div class="nav-item${currentPanel===it.id?' active':''}" onclick="sbNavItem('${it.id}')">`+
-    `<div class="nav-icon"><i class="fa-solid ${it.icon}"></i></div>${it.label}`+
+    `<div class="nav-icon"><i class="fa-solid ${it.icon}"></i></div>${it.label}${extra}`+
   `</div>`;
+}
+
+// Data local (YYYY-MM-DD) no fuso do usuário — evita o bug do UTC virar o dia à noite
+function hojeLocal(){
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+// Conta reservas pendentes (só faz sentido para admin/gestor)
+function _pendentesCount(){
+  const nivel=window._userNivel||'morador';
+  if(nivel!=='admin' && nivel!=='gestor') return 0;
+  return (G('reservas')||[]).filter(r=>r.status==='pendente').length;
 }
 
 function sbAbrirGrupo(key, hdEl){
@@ -6226,8 +6300,10 @@ function initApp(){
   const nivel = window._userNivel || 'morador';
   const permitidos = ACESSO_PAINEIS[nivel] || ACESSO_PAINEIS.morador;
   const _mods = modulosAtivos();
-  let dest = 'inicio';
+  // Landing padrão: admin/gestor -> Dashboard; morador -> Início. Última tela tem prioridade.
+  let dest = (nivel==='admin'||nivel==='gestor') ? 'dashboard' : 'inicio';
   try{ const ult = localStorage.getItem('apvc_last_panel'); if(ult) dest = ult; }catch(_){}
+  if(permitidos.indexOf(dest) < 0) dest = (nivel==='admin'||nivel==='gestor') ? 'dashboard' : 'inicio';
   if(permitidos.indexOf(dest) < 0) dest = 'inicio';
   const _modD = painelModulo(dest);
   if(_modD && _mods.indexOf(_modD) < 0) dest = 'inicio';
@@ -7438,7 +7514,7 @@ function renderReservas(){
   const fFim=$('res-f-fim')?.value||'';
   const ordem=$('res-ordem')?.value||'data_desc';
 
-  const hoje=new Date().toISOString().slice(0,10);
+  const hoje=hojeLocal();
 
   // Determina se mostra reservas passadas:
   // mostra passadas se: filtro de status for "todas"/específico, ou se houver filtro de data explícito
@@ -7655,6 +7731,83 @@ function verPendentesRes(){
   renderReservas();
 }
 
+/* ══════════════════════════
+   CALENDÁRIO MENSAL DE RESERVAS
+══════════════════════════ */
+let _resView='lista';
+let _resCalRef=null; // Date do 1º dia do mês exibido
+const _CAL_CORES={confirmada:'#2A9D6F',pendente:'#F0A843',realizada:'#5B9CF6',concluida:'#14b8a6',cancelada:'#E05252'};
+
+function resToggleView(){
+  _resView = (_resView==='lista') ? 'calendario' : 'lista';
+  const btn=$('res-btn-view');
+  const emCal=_resView==='calendario';
+  // elementos da visão lista
+  ['res-kpi','res-dash','res-lista-card','res-filtros-card'].forEach(function(id){ var e=$(id); if(e) e.style.display = emCal ? 'none' : ''; });
+  if($('res-calendario')) $('res-calendario').style.display = emCal ? '' : 'none';
+  if(btn) btn.innerHTML = emCal ? '<i class="fa-solid fa-list"></i> Ver lista' : '<i class="fa-solid fa-calendar-days"></i> Ver calendário';
+  if(emCal){ if(!_resCalRef){ var h=new Date(); _resCalRef=new Date(h.getFullYear(),h.getMonth(),1); } _resCalPopularEspacos(); renderCalendario(); }
+  else renderReservas();
+}
+function _resCalPopularEspacos(){
+  var sel=$('res-cal-espaco'); if(!sel||sel._filled||typeof ESPACOS_CFG==='undefined') return;
+  sel.innerHTML='<option value="">Todos os espaços</option>'+ESPACOS_CFG.map(function(e){return '<option>'+e+'</option>';}).join('');
+  sel._filled=true;
+}
+function resCalNav(delta){ if(!_resCalRef) _resCalRef=new Date(); _resCalRef=new Date(_resCalRef.getFullYear(),_resCalRef.getMonth()+delta,1); renderCalendario(); }
+function resCalHoje(){ var h=new Date(); _resCalRef=new Date(h.getFullYear(),h.getMonth(),1); renderCalendario(); }
+
+function renderCalendario(){
+  var grid=$('res-cal-grid'); if(!grid) return;
+  if(!_resCalRef){ var h0=new Date(); _resCalRef=new Date(h0.getFullYear(),h0.getMonth(),1); }
+  var ano=_resCalRef.getFullYear(), mes=_resCalRef.getMonth();
+  var meses=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  if($('res-cal-titulo')) $('res-cal-titulo').textContent=meses[mes]+' '+ano;
+  var espFiltro=$('res-cal-espaco')?$('res-cal-espaco').value:'';
+  var reservas=(G('reservas')||[]).filter(function(r){
+    if(r.status==='cancelada') return false;
+    if(espFiltro && r.espaco!==espFiltro) return false;
+    return (r.data||'').slice(0,7)===(ano+'-'+String(mes+1).padStart(2,'0'));
+  });
+  var porDia={};
+  reservas.forEach(function(r){ var d=(r.data||'').slice(8,10); (porDia[d]=porDia[d]||[]).push(r); });
+
+  var primeiroDiaSem=new Date(ano,mes,1).getDay(); // 0=Dom
+  var diasNoMes=new Date(ano,mes+1,0).getDate();
+  var hojeStr=hojeLocal();
+  var dias=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  var html='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">';
+  html+=dias.map(function(d){return '<div style="text-align:center;font-size:11px;font-weight:700;color:var(--text-3);padding:4px 0">'+d+'</div>';}).join('');
+  for(var i=0;i<primeiroDiaSem;i++) html+='<div></div>';
+  for(var dia=1;dia<=diasNoMes;dia++){
+    var dd=String(dia).padStart(2,'0');
+    var dataStr=ano+'-'+String(mes+1).padStart(2,'0')+'-'+dd;
+    var lista=porDia[dd]||[];
+    var ehHoje=dataStr===hojeStr;
+    var chips=lista.slice(0,3).map(function(r){
+      var cor=_CAL_CORES[r.status]||'#888';
+      return '<div title="'+(r.horario||'')+' '+(r.espaco||'')+' — '+(r.nome||'')+'" style="font-size:10px;color:#fff;background:'+cor+';border-radius:4px;padding:1px 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.horario||'').split(/[-–]/)[0]+' '+(r.espaco||'').slice(0,10)+'</div>';
+    }).join('');
+    var mais=lista.length>3?'<div style="font-size:10px;color:var(--text-3);margin-top:2px">+'+(lista.length-3)+' mais</div>':'';
+    html+='<div onclick="resCalDiaClick(\''+dataStr+'\')" style="min-height:78px;border:1px solid '+(ehHoje?'var(--gold)':'var(--border)')+';border-radius:8px;padding:4px 5px;cursor:pointer;background:'+(ehHoje?'rgba(232,119,34,0.06)':'var(--ink-2)')+';overflow:hidden">'+
+      '<div style="font-size:12px;font-weight:700;color:'+(ehHoje?'var(--gold)':'var(--text-2)')+'">'+dia+'</div>'+chips+mais+'</div>';
+  }
+  html+='</div>';
+  html+='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--text-3)">'+
+    Object.keys(_CAL_CORES).filter(function(k){return k!=='cancelada';}).map(function(k){
+      return '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:'+_CAL_CORES[k]+'"></span>'+({confirmada:'Confirmada',pendente:'Pendente',realizada:'Realizada',concluida:'Concluída'}[k])+'</span>';
+    }).join('')+'</div>';
+  grid.innerHTML=html;
+}
+function resCalDiaClick(dataStr){
+  // Abre a lista filtrada por essa data
+  _resView='calendario'; // permanece, mas mostramos a lista do dia via filtro
+  if($('res-f-ini')) $('res-f-ini').value=dataStr;
+  if($('res-f-fim')) $('res-f-fim').value=dataStr;
+  resToggleView(); // volta pra lista já filtrada
+  toast('Mostrando reservas de '+new Date(dataStr+'T00:00').toLocaleDateString('pt-BR'));
+}
+
 // Atualiza o badge de pendentes no menu (só admin/gestor)
 function atualizarBadgePendentes(){
   const b=$('badge-pendentes'); if(!b) return;
@@ -7780,6 +7933,30 @@ function _abrirImpressao(titulo, corpoHtml){
   w.document.close();
 }
 
+function exportarReservasCSV(){
+  var lista=_relFiltradas();
+  if(!lista.length){ toast('Nenhuma reserva no filtro para exportar.'); return; }
+  var cols=['Data','Horario','Espaco','Morador','Unidade','Telefone','Finalidade','Status','Taxa','Caucao','Pagamento','Observacao'];
+  var esc=function(v){ v=(v==null?'':String(v)).replace(/"/g,'""'); return '"'+v+'"'; };
+  var linhas=[cols.join(';')];
+  lista.forEach(function(r){
+    linhas.push([
+      _relFmtData(r.data), r.horario||'', r.espaco||'', r.nome||'', r.lote||'', r.tel||'', r.finalidade||'',
+      _REL_STATUS_LABEL[r.status]||r.status||'', (parseFloat(r.taxa)||0).toFixed(2).replace('.',','),
+      (parseFloat(r.caucao)||0).toFixed(2).replace('.',','),
+      (r.pgto==='pago'?'Pago':r.pgto==='isento'?'Isento':'Pendente'), r.obs||''
+    ].map(esc).join(';'));
+  });
+  // BOM para o Excel abrir com acentos corretos
+  var blob=new Blob(['﻿'+linhas.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='reservas_'+hojeLocal()+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  toast('✓ CSV exportado ('+lista.length+' reservas).');
+}
+
 function imprimirRelatorioReservas(){
   var lista=_relFiltradas();
   if(!lista.length){ toast('Nenhuma reserva no filtro para imprimir.'); return; }
@@ -7900,7 +8077,7 @@ function mresAplicarLimitesData(){
   var antec =parseInt(cfg['disp_'+chv+'_antec'],10);
   var hoje=new Date(); hoje.setHours(0,0,0,0);
   var dMin=new Date(hoje); dMin.setDate(dMin.getDate()+antmin);
-  var iso=function(d){ return d.toISOString().slice(0,10); };
+  var iso=function(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
   inp.min=iso(dMin);
   if(!isNaN(antec)&&antec>0){ var dMax=new Date(hoje); dMax.setDate(dMax.getDate()+antec); inp.max=iso(dMax); }
   else inp.removeAttribute('max');
@@ -8048,7 +8225,7 @@ function abrirModalRes(id){
   mresPopularEspacos(r?.espaco||'');
   $('mres-espaco').value=r?.espaco||$('mres-espaco').options[0]?.value||'Quadra de Areia';
   if($('mres-status')) $('mres-status').value=r?.status||'pendente';
-  $('mres-data').value=r?.data||new Date().toISOString().slice(0,10);
+  $('mres-data').value=r?.data||hojeLocal();
 
   // Horário
   const hrVal=r?.horario||'08:00–12:00';
@@ -8149,6 +8326,12 @@ function salvarRes(){
   const _viol = reservaViolaRegra(espacoRes, dataRes, hr, ($('mres-lote').value||'').trim(), id?+id:null);
   if(_viol){ toast('⛔ '+_viol); return; }
 
+  // ── Regras gerais (só para morador; admin/gestor ficam livres) ──
+  if(!_isAdminRes){
+    const _regra = reservaRegrasMorador(uniSel, id?+id:null);
+    if(_regra){ toast('⛔ '+_regra); return; }
+  }
+
   // ── Validação: Termo de Responsabilidade obrigatório ──
   if(!$('mres-chk-termo').checked){
     if($('mres-termo-aviso')) $('mres-termo-aviso').style.display='block';
@@ -8188,9 +8371,13 @@ function salvarRes(){
   //  - admin/gestor: usa o valor escolhido no formulário
   //  - morador: se o espaço exigir confirmação do admin -> 'pendente'; senão já entra 'confirmada'
   const nivel2 = window._userNivel||'morador';
+  const _resExistente = id ? all.find(x=>x.id===+id) : null;
   let statusVal;
   if(nivel2==='admin'||nivel2==='gestor'){
     statusVal = $('mres-status')?$('mres-status').value:'pendente';
+  } else if(_resExistente && _resExistente.status && _resExistente.status!=='pendente'){
+    // Morador editando reserva que JÁ foi tratada (confirmada/realizada/etc.): mantém o status atual
+    statusVal = _resExistente.status;
   } else {
     const _cfgRes = getCfgRes();
     const _exige = !!_cfgRes['disp_'+_chvEsp(espacoRes)+'_confirmar'];
@@ -8365,7 +8552,31 @@ function atualizarEmptyHorarios(){
 }
 
 // ── Verificar e exibir alertas ──
+// Lembrete automático 1 dia antes (roda enquanto o app está aberto).
+function verificarLembretesReserva(){
+  var cfg=getCfgRes();
+  if(!cfg.notif_lembrete_ativo) return;
+  var d=new Date(); d.setDate(d.getDate()+1);
+  var amanha=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var enviados; try{ enviados=JSON.parse(localStorage.getItem('apvc_lembretes_env')||'[]'); }catch(_){ enviados=[]; }
+  (G('reservas')||[]).forEach(function(r){
+    if(r.data!==amanha) return;
+    if(r.status!=='confirmada' && r.status!=='pendente') return;
+    var dest=(r.criadoPor||'').trim(); if(!dest) return;
+    var chave=r.id+'|'+r.data;
+    if(enviados.indexOf(chave)>=0) return;
+    var corpo='Lembrete: você tem uma reserva amanhã.\n\nEspaço: '+r.espaco+'\nData: '+
+      new Date(r.data+'T00:00').toLocaleDateString('pt-BR')+'\nHorário: '+r.horario+'\nUnidade: '+r.lote;
+    enviarEmail(dest,'Lembrete de reserva — '+r.espaco,corpo).then(function(res){
+      if(res.ok){ enviados.push(chave); try{ localStorage.setItem('apvc_lembretes_env',JSON.stringify(enviados.slice(-300))); }catch(_){}
+        addLog('✓ Lembrete enviado ao morador — '+r.espaco+' ('+r.data+')'); }
+      else addLog('✗ Lembrete falhou ('+r.espaco+'): '+res.erro);
+    });
+  });
+}
+
 function verificarAlertas(){
+  try{ verificarLembretesReserva(); }catch(_){}
   const all=G('reservas')||[];
   const agora=new Date();
   const agoraMs=agora.getTime();
@@ -9183,6 +9394,9 @@ function renderCfgReservas(){
   if($('cfg-notif-admin'))       $('cfg-notif-admin').checked       = !!cfgRes.notif_admin_ativo;
   if($('cfg-notif-admin-email')) $('cfg-notif-admin-email').value   = cfgRes.notif_admin_email||'';
   if($('cfg-notif-morador'))     $('cfg-notif-morador').checked     = !!cfgRes.notif_morador_ativo;
+  if($('cfg-notif-lembrete'))    $('cfg-notif-lembrete').checked    = !!cfgRes.notif_lembrete_ativo;
+  if($('cfg-bloq-inad'))         $('cfg-bloq-inad').checked         = !!cfgRes.bloquear_inadimplente;
+  if($('cfg-max-reservas'))      $('cfg-max-reservas').value        = cfgRes.max_reservas_morador||'';
 
   // Termos por espaço
   if(elTermos){
@@ -9280,27 +9494,21 @@ function renderCfgDisponibilidade(){
       var on=dias.indexOf(i)>=0;
       return '<label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:3px 8px;border-radius:6px;border:1px solid '+(on?'rgba(232,119,34,0.4)':'var(--border)')+';background:'+(on?'rgba(232,119,34,0.12)':'var(--ink-2)')+';color:'+(on?'var(--gold)':'var(--text-3)')+'"><input type="checkbox" data-disp-dia="'+chv+'" value="'+i+'" '+(on?'checked':'')+' style="accent-color:var(--gold)">'+d+'</label>';
     }).join('');
-    return '<div data-disp-card="'+chv+'" style="background:var(--ink-2);border:1px solid '+(ativo?'var(--border)':'rgba(224,82,82,0.4)')+';border-radius:10px;padding:12px 14px;opacity:'+(ativo?'1':'0.6')+'">'+
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
+    return '<div data-disp-card="'+chv+'" class="cfg-disp-card" style="border-color:'+(ativo?'var(--border)':'rgba(224,82,82,0.4)')+';opacity:'+(ativo?'1':'0.6')+'">'+
+      '<div class="cfg-disp-head">'+
       '<span style="font-size:13px;font-weight:700;color:var(--text)">'+esp+'</span>'+
       (ativo?'':'<span style="font-size:10px;font-weight:700;color:var(--red);background:rgba(224,82,82,0.12);border:1px solid rgba(224,82,82,0.3);border-radius:6px;padding:2px 7px">DESATIVADO</span>')+
-      '<label style="margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);cursor:pointer"><input type="checkbox" data-disp-ativo="'+chv+'" '+(ativo?'checked':'')+' onchange="renderCfgDisponibilidade&&this.closest(\'[data-disp-card]\')&&(this.closest(\'[data-disp-card]\').style.opacity=this.checked?1:0.6)" style="width:34px;height:18px;accent-color:var(--gold);cursor:pointer">Espaço ativo (aparece para o morador)</label>'+
+      '<label class="cfg-disp-ativo"><input type="checkbox" data-disp-ativo="'+chv+'" '+(ativo?'checked':'')+' onchange="renderCfgDisponibilidade&&this.closest(\'[data-disp-card]\')&&(this.closest(\'[data-disp-card]\').style.opacity=this.checked?1:0.6)" style="width:34px;height:18px;accent-color:var(--gold);cursor:pointer"><span>Espaço ativo (aparece para o morador)</span></label>'+
       '</div>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">'+chips+
-      '<span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)">Máx. horas/morador/dia:'+
-      '<input type="number" min="0" step="0.5" data-disp-maxh="'+chv+'" value="'+maxh+'" placeholder="0" style="width:70px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px"></span>'+
-      '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)">Antecedência máx. (dias):'+
-      '<input type="number" min="0" step="1" data-disp-antec="'+chv+'" value="'+antec+'" placeholder="0" title="Morador só consegue reservar até N dias à frente (0 = sem limite)" style="width:70px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px"></span>'+
+      '<div class="cfg-disp-dias">'+chips+'</div>'+
+      '<div class="cfg-disp-flds">'+
+      '<label class="cfg-disp-fld num"><span>Máx. horas/morador/dia:</span><input type="number" min="0" step="0.5" data-disp-maxh="'+chv+'" value="'+maxh+'" placeholder="0"></label>'+
+      '<label class="cfg-disp-fld num"><span>Antecedência máx. (dias):</span><input type="number" min="0" step="1" data-disp-antec="'+chv+'" value="'+antec+'" placeholder="0" title="Morador só consegue reservar até N dias à frente (0 = sem limite)"></label>'+
+      '<label class="cfg-disp-fld num"><span>Antecedência mín. (dias):</span><input type="number" min="0" step="1" data-disp-antmin="'+chv+'" value="'+antmin+'" placeholder="0" title="Reserva só a partir de N dias à frente (ex: 7 = salão precisa de preparo). 0 = sem exigência"></label>'+
+      '<label class="cfg-disp-fld slots"><span>Horários permitidos:</span><input type="text" data-disp-slots="'+chv+'" value="'+slots+'" placeholder="Ex: 07:00–08:00, 08:00–09:00 (vazio = padrão)" title="Somente estes horários aparecem para o morador. Separe por vírgula."></label>'+
       '</div>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:8px">'+
-      '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)">Antecedência mín. (dias):'+
-      '<input type="number" min="0" step="1" data-disp-antmin="'+chv+'" value="'+antmin+'" placeholder="0" title="Reserva só a partir de N dias à frente (ex: 7 = salão precisa de preparo). 0 = sem exigência" style="width:70px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px"></span>'+
-      '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);flex:1;min-width:260px">Horários permitidos:'+
-      '<input type="text" data-disp-slots="'+chv+'" value="'+slots+'" placeholder="Ex: 07:00–08:00, 08:00–09:00 (vazio = padrão)" title="Somente estes horários aparecem para o morador. Separe por vírgula." style="flex:1;min-width:180px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12px"></span>'+
-      '</div>'+
-      '<div style="margin-top:10px">'+
-      '<label style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-2);cursor:pointer"><input type="checkbox" data-disp-confirmar="'+chv+'" '+(confirmar?'checked':'')+' style="width:16px;height:16px;accent-color:var(--gold)" title="Se marcado, a reserva do morador fica PENDENTE até o administrador confirmar. Se desmarcado, a reserva já fica CONFIRMADA automaticamente.">Exigir confirmação do administrador (reserva fica <b>pendente</b> até aprovar)</label>'+
-      '</div></div>';
+      '<label class="cfg-disp-check"><input type="checkbox" data-disp-confirmar="'+chv+'" '+(confirmar?'checked':'')+' style="width:16px;height:16px;accent-color:var(--gold);flex-shrink:0" title="Se marcado, a reserva do morador fica PENDENTE até o administrador confirmar. Se desmarcado, a reserva já fica CONFIRMADA automaticamente."><span>Exigir confirmação do administrador <span style="color:var(--text-3)">(reserva fica <b style="color:var(--amber)">pendente</b> até aprovar)</span></span></label>'+
+      '</div>';
   }).join('');
 }
 
@@ -9340,6 +9548,33 @@ function bloqueioAdd(){
 function bloqueioRemove(id){
   var cfg=getCfgRes(); cfg.bloqueios=(cfg.bloqueios||[]).filter(function(b){return b.id!==id;});
   setCfgRes(cfg); renderCfgBloqueios(); toast('✓ Bloqueio removido.');
+}
+
+// Regras gerais para morador: inadimplência e limite de reservas em aberto.
+// Retorna mensagem de erro ou null.
+function reservaRegrasMorador(unidade, idAtual){
+  var cfg=getCfgRes();
+  var uni=String(unidade||'').trim().toUpperCase();
+  // 1) Bloqueio de inadimplente
+  if(cfg.bloquear_inadimplente){
+    var inad=(G('inadimplencia')||[]).some(function(i){
+      return String(i.lote||'').trim().toUpperCase()===uni && i.status && i.status!=='em_dia';
+    });
+    if(inad) return 'Sua unidade consta como inadimplente. Regularize a situação para poder reservar (fale com a administração).';
+  }
+  // 2) Limite de reservas em aberto (pendente + confirmada, de hoje em diante)
+  var max=parseInt(cfg.max_reservas_morador,10);
+  if(!isNaN(max) && max>0){
+    var hoje=hojeLocal();
+    var abertas=(G('reservas')||[]).filter(function(r){
+      if(idAtual && r.id===idAtual) return false;
+      if(String(r.lote||'').trim().toUpperCase()!==uni) return false;
+      if(r.status!=='pendente' && r.status!=='confirmada') return false;
+      return (r.data||'') >= hoje;
+    }).length;
+    if(abertas>=max) return 'Você já atingiu o limite de '+max+' reserva(s) em aberto. Aguarde a conclusão de uma reserva para fazer outra.';
+  }
+  return null;
 }
 
 // Verifica se uma reserva fere alguma regra (dia, bloqueio, limite). Retorna msg ou null.
@@ -9420,6 +9655,9 @@ function salvarCfgReservas(){
   if($('cfg-notif-admin'))       cfgRes.notif_admin_ativo   = $('cfg-notif-admin').checked;
   if($('cfg-notif-admin-email')) cfgRes.notif_admin_email   = $('cfg-notif-admin-email').value.trim();
   if($('cfg-notif-morador'))     cfgRes.notif_morador_ativo = $('cfg-notif-morador').checked;
+  if($('cfg-notif-lembrete'))    cfgRes.notif_lembrete_ativo = $('cfg-notif-lembrete').checked;
+  if($('cfg-bloq-inad'))         cfgRes.bloquear_inadimplente = $('cfg-bloq-inad').checked;
+  if($('cfg-max-reservas'))      cfgRes.max_reservas_morador = parseInt($('cfg-max-reservas').value,10)||0;
 
   // Salva termos
   if(elTermos){
@@ -10466,6 +10704,18 @@ async function aprovarUsuario(){
     fecharModalUsr();
     await renderUsuarios();
     toast('✓ Acesso aprovado!');
+    // Envia e-mail de boas-vindas ao usuário aprovado (Supabase + Resend)
+    if(u.email){
+      var _cond = nomeCondominioAtual();
+      var _corpo = 'Olá, '+(u.nome||'')+'!\n\nSeu acesso ao portal '+_cond+' foi APROVADO. ✅\n\n'+
+        'Você já pode entrar com:\n'+
+        '• E-mail: '+u.email+'\n'+
+        '• Senha: a que você cadastrou\n\n'+
+        'Acesse o portal e faça login. Bem-vindo(a)!';
+      enviarEmail(u.email, 'Acesso aprovado — '+_cond, _corpo).then(function(r){
+        if(typeof addLog==='function') addLog((r.ok?'✓':'✗')+' E-mail de aprovação para '+u.email+(r.ok?'':': '+r.erro));
+      });
+    }
   } catch(e){ toast('⚠️ Erro: '+(e.message||e)); }
 }
 
